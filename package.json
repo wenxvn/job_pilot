@@ -1,0 +1,24 @@
+{
+  "name": "job_pilot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wenxvn/job_pilot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/wenxvn/job_pilot/issues"
+  },
+  "homepage": "https://github.com/wenxvn/job_pilot#readme",
+  "dependencies": {
+    "@insforge/sdk": "^1.4.2"
+  }
+}
