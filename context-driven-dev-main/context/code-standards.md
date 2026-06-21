@@ -1,108 +1,155 @@
-<!-- Code standards: rules the agent must follow when writing code for this project -->
+# 代码规范
 
-# Code Standards
-
-Implementation rules and conventions for the entire project. The AI agent must follow these in every session without exception. These rules prevent pattern drift across sessions.
+本项目所有代码实现必须遵循以下规则。这些规则防止跨会话的模式漂移。
 
 ---
 
-## Engineering Mindset
+## 工程心态
 
-- [e.g. Think before implementing — understand what is being built and why before writing a single line]
-- [e.g. Scope is sacred — only build what the current feature requires]
-- [e.g. Clean over clever — simple readable code is always preferred]
-- [e.g. One thing at a time — complete one feature fully before touching the next]
-
----
-
-## Language & Type Safety
-
-- [e.g. Strict mode enabled — no exceptions]
-- [e.g. Never use `any` — use `unknown` and narrow the type]
-- [e.g. All function parameters and return types must be explicitly typed]
-- [e.g. Use `const` by default — only use `let` when reassignment is necessary]
+- 先理解再实现 — 在写任何代码之前，理解正在构建什么以及为什么
+- 范围神圣不可变 — 只构建当前功能所需的内容
+- 简洁优于聪明 — 简单可读的代码总是首选
+- 一次一件事 — 完整完成一个功能后再开始下一个
 
 ---
 
-## File and Folder Naming
+## 语言和类型安全
 
-- [e.g. Folders: kebab-case]
-- [e.g. Component files: PascalCase]
-- [e.g. Utility files: camelCase]
-- [e.g. One component per file]
+- 启用严格模式 — 没有例外
+- 禁止使用 `any` — 使用 `unknown` 并进行类型收窄
+- 所有函数参数和返回类型必须显式标注
+- 默认使用 `const` — 仅在需要重新赋值时使用 `let`
 
 ---
 
-## Component / Module Structure
+## 文件和文件夹命名
 
+- 文件夹：kebab-case
+- 组件文件：PascalCase
+- 工具文件：camelCase
+- 每个文件一个组件
+
+---
+
+## 组件/模块结构
+
+```typescript
+// 1. 导入
+import { ... } from '...'
+
+// 2. 类型定义
+interface Props { ... }
+
+// 3. 组件/函数
+export function ComponentName({ ... }: Props) {
+  // hooks
+  // handlers
+  // render
+}
+
+// 4. 导出（如未使用 export function）
 ```
-[Paste your preferred component or module structure here as a code snippet]
-[e.g. imports → types → component/function → exports]
+
+- 不使用内联样式 — 所有样式通过设计令牌
+- UI 组件内不包含业务逻辑
+
+---
+
+## API/后端规范
+
+```typescript
+// API Route 示例
+export async function POST(request: Request) {
+  try {
+    // 1. 验证请求
+    const body = await request.json()
+    
+    // 2. 验证用户身份
+    const { user, error: authError } = await getUser(request)
+    if (authError) return NextResponse.json({ success: false, error: authError }, { status: 401 })
+    
+    // 3. 业务逻辑
+    const result = await doSomething(body, user.id)
+    
+    // 4. 返回结果
+    return NextResponse.json({ success: true, data: result })
+  } catch (error) {
+    return NextResponse.json({ success: false, error: '服务器错误' }, { status: 500 })
+  }
+}
 ```
 
-- [e.g. No inline styles — all styling via design tokens]
-- [e.g. No business logic inside UI components]
+- 每个路由在处理前验证请求
+- 始终返回 `{ success: boolean, data?, error? }`
+- 永不暴露原始错误消息给客户端
 
 ---
 
-## API / Backend Conventions
+## 数据库
 
-```
-[Paste your preferred route or controller structure here as a code snippet]
-```
-
-- [e.g. Every route validates the request before processing]
-- [e.g. Always return `{ success: boolean, data?, error? }`]
-- [e.g. Never expose raw error messages to the client]
-
----
-
-## Database
-
-- [e.g. Never query the DB directly from a component — always through a service layer]
-- [e.g. Always scope queries to the current user — never fetch without a user filter]
-- [e.g. Use transactions for operations that touch more than one table]
+- 永不直接从组件查询数据库 — 始终通过服务层
+- 始终限定查询范围为当前用户 — 不在没有用户过滤器的情况下获取数据
+- 涉及多个表的操作使用事务
+- 数据库插入使用数组格式：`insert([{ ... }])`
+- 引用用户使用 `auth.users(id)`；在 RLS 策略中使用 `auth.uid()`
+- 存储上传时，同时保存返回的 `url` 和 `key`
 
 ---
 
-## Error Handling
+## InsForge 规范
 
-- [e.g. Never use empty catch blocks — always log or handle]
-- [e.g. User-facing errors must be human readable]
-- [e.g. Log errors with a context prefix: `[module/function]`]
-
----
-
-## Analytics Events
-
-| Event          | When            | Properties |
-| -------------- | --------------- | ---------- |
-| `[event_name]` | [When it fires] | [params]   |
-| `[event_name]` | [When it fires] | [params]   |
+- 所有数据库写入通过 `lib/insforge-server.ts`
+- 客户端实例在 `lib/insforge-client.ts`
+- SDK 返回 `{data, error}` 结构
+- AI 集成使用 OpenRouter：`baseURL: "https://openrouter.ai/api/v1"`，服务端使用 `OPENROUTER_API_KEY`
 
 ---
 
-## Environment Variables
+## 错误处理
 
-| Variable     | Used In          |
-| ------------ | ---------------- |
-| `[VAR_NAME]` | [file or module] |
-| `[VAR_NAME]` | [file or module] |
-
----
-
-## Comments
-
-- [e.g. No comments explaining what the code does — code must be self-explanatory]
-- [e.g. Comments only for why — explaining a non-obvious decision]
+- 禁止使用空 catch 块 — 始终记录或处理
+- 面向用户的错误必须是人类可读的
+- 记录错误时带上下文前缀：`[module/function]`
+- 每个 Stagehand `act()` 调用必须包裹在 try/catch 中
 
 ---
 
-## Dependencies
+## 环境变量
 
-Approved dependencies for this project:
+| 变量                        | 用途                     |
+| --------------------------- | ------------------------ |
+| NEXT_PUBLIC_INSFORGE_URL    | InsForge 后端 URL        |
+| NEXT_PUBLIC_INSFORGE_ANON_KEY | InsForge 匿名密钥      |
+| INSFORGE_SERVICE_ROLE_KEY   | InsForge 服务角色密钥    |
+| BROWSERBASE_API_KEY         | Browserbase API 密钥     |
+| BROWSERBASE_PROJECT_ID      | Browserbase 项目 ID      |
+| OPENAI_API_KEY              | OpenAI API 密钥          |
+| AGENTSPAN_API_KEY           | AgentSpan API 密钥       |
+| NEXT_PUBLIC_APP_URL         | 应用 URL                 |
 
-- [package] — [purpose]
-- [package] — [purpose]
+---
 
-Do not install any other packages without updating this list first.
+## 注释
+
+- 不写解释代码做了什么的注释 — 代码必须自解释
+- 注释只解释为什么 — 解释不明显的决策
+
+---
+
+## 依赖
+
+本项目已批准的依赖：
+
+- `next` — 框架
+- `react` / `react-dom` — UI 库
+- `tailwindcss` — 样式
+- `@insforge/sdk` — 后端 SDK
+- `openai` — AI 集成
+- `@browserbasehq/sdk` — Browserbase SDK
+- `stagehand` — AI 浏览器代理
+- `agentspan` — 代理编排
+- `lucide-react` — 图标
+- `@radix-ui/*` — UI 原语
+- `shadcn/ui` 组件 — UI 组件
+
+不要在未更新此列表的情况下安装其他包。

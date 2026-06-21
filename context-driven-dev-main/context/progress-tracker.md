@@ -1,52 +1,58 @@
-<!-- Progress tracker: live build status — update this after every session -->
+# 进度跟踪器
 
-# Progress Tracker
-
-**Last updated:** [YYYY-MM-DD]
-**Current phase:** [Phase name]
-**Overall status:** [e.g. In progress / Blocked / On track]
+**最后更新：** 2026-06-21
+**当前阶段：** 第一阶段 — 基础设施
+**总体状态：** 进行中
 
 ---
 
-## Completed
-- [x] [Task — e.g. Project initialized with Next.js + Tailwind]
-- [x] [Task]
-- [x] [Task]
+## 已完成
+- [x] 规范性文件创建和初始化
+- [x] 项目概述文档
+- [x] 架构文档
+- [x] 代码规范文档
+- [x] 库文档
+- [x] UI 令牌文档
+- [x] UI 规则文档
+- [x] 构建计划文档
 
-## In Progress
-- [ ] [Task currently being worked on]
-- [ ] [Task currently being worked on]
+## 进行中
+- [ ] 项目初始化（Next.js 15 + Tailwind CSS v4）
+- [ ] InsForge SDK 集成
 
-## Up Next
-- [ ] [Next task to start]
-- [ ] [Task after that]
-- [ ] [Task after that]
+## 待开始
+- [ ] 认证功能
+- [ ] 个人资料页面
+- [ ] 职位列表页面
+- [ ] 职位详情页面
+- [ ] 职位搜索与匹配
+- [ ] 简历生成与定制
+- [ ] 申请记录
 
-## Blocked
-- [ ] [Task] — **Blocked by:** [what's blocking it]
-
----
-
-## Known Issues
-| Issue | Severity | Status |
-|-------|----------|--------|
-| [Description of issue] | High / Medium / Low | Open / In progress / Resolved |
-| [Description of issue] | High / Medium / Low | Open / In progress / Resolved |
-
----
-
-## Decisions Made
-[Log important decisions here so the agent doesn't re-debate them.]
-
-- **[Date]** — [Decision made and why]
-- **[Date]** — [Decision made and why]
+## 阻塞
+- 无
 
 ---
 
-## Session Notes
-[Brief notes from the last few sessions — what was done, what broke, what to watch for.]
+## 已知问题
+| 问题 | 严重性 | 状态 |
+|------|--------|------|
+| 无 | - | - |
 
-**[Date]**
-- [What was done]
-- [What broke or needs attention]
-- [What to do next session]
+---
+
+## 决策记录
+
+- **2026-06-21** — 选择 Tailwind CSS v4 而非 v3.4
+- **2026-06-21** — 确认使用 shadcn/ui + lucide-react + radix-ui 作为 UI 组件库
+- **2026-06-21** — 确认四张核心数据表：profiles、jobs、resumes、applications
+- **2026-06-21** — 确认功能范围：LinkedIn 搜索、匹配评分、简历管理、自动申请
+
+---
+
+## 会话记录
+
+**2026-06-21**
+- 创建和完善所有规范性文档
+- 确认项目技术栈和功能范围
+- 下一步：初始化项目并开始第一阶段

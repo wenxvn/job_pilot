@@ -1,106 +1,178 @@
-<!-- Build plan: features broken into phases with clear done criteria -->
+# 构建计划
 
-# Build Plan
+## 核心原则
 
-## Core Principle
-
-[Describe your build philosophy here. e.g. Full page UI built with mock data first — verified visually before any logic is written. Then functionality is built and wired step by step. Every feature must be visible and testable before moving to the next. No invisible backend phases.]
+先用模拟数据构建完整页面 UI — 视觉验证后再写任何逻辑。然后逐步构建和连接功能。每个功能必须在进入下一个之前可见且可测试。没有不可见的后端阶段。
 
 ---
 
-## Phase 1 — [Name]
+## 第一阶段 — 基础设施
 
-### 01 [Feature Name]
+### 01 项目初始化
 
-[One sentence describing what this feature builds.]
+初始化 Next.js 15 项目，配置 Tailwind CSS v4、shadcn/ui、InsForge SDK。
 
-**UI:**
+**UI：**
 
-- [UI element or screen to build]
-- [UI element or screen to build]
+- 配置 `globals.css` 中的 `@theme` 令牌
+- 导入 Inter 字体
+- 创建根布局
 
-**Logic:**
+**逻辑：**
 
-- [Backend or data logic to implement]
-- [Backend or data logic to implement]
-
----
-
-### 02 [Feature Name]
-
-[One sentence describing what this feature builds.]
-
-**UI:**
-
-- [UI element or screen to build]
-
-**Logic:**
-
-- [Backend or data logic to implement]
-- [Backend or data logic to implement]
-
-**Analytics events:** `[event_name]`, `[event_name]`
+- 安装依赖
+- 配置环境变量
+- 创建 InsForge 客户端（客户端 + 服务端）
 
 ---
 
-## Phase 2 — [Name]
+### 02 认证
 
-### 03 [Feature Name] — Full UI
+实现 InsForge Auth 用户注册和登录。
 
-[One sentence. Note if this is a UI-only step with mock data.]
+**UI：**
 
-**UI:**
+- 登录页（`/login`）
+- 注册页（`/signup`）
+- 导航栏用户头像/下拉菜单
 
-- [UI element]
-- [UI element]
+**逻辑：**
 
----
-
-### 04 [Feature Name] — Logic
-
-[One sentence. Note if this wires an existing UI to real data.]
-
-**Logic:**
-
-- [Logic step]
-- [Logic step]
+- InsForge Auth 集成
+- 会话管理
+- 认证中间件（保护路由）
 
 ---
 
-## Phase 3 — [Name]
+## 第二阶段 — 核心页面
 
-### 05 [Feature Name]
+### 03 个人资料 — 完整 UI
 
-**UI:**
+个人资料管理页面，使用模拟数据。
 
-- [UI element]
+**UI：**
 
-**Logic:**
-
-- [Logic step]
-
----
-
-## Phase 4 — [Name]
-
-### 06 [Feature Name]
-
-**UI:**
-
-- [UI element]
-
-**Logic:**
-
-- [Logic step]
+- 资料表单（姓名、邮箱、经验、技能、目标职位、薪资范围）
+- 技能标签输入
+- 简历上传区域
 
 ---
 
-## Feature Count
+### 04 个人资料 — 逻辑
 
-| Phase     | Name   | Features |
-| --------- | ------ | -------- |
-| 1         | [Name] | [n]      |
-| 2         | [Name] | [n]      |
-| 3         | [Name] | [n]      |
-| 4         | [Name] | [n]      |
-| **Total** |        | **[n]**  |
+连接个人资料 UI 到 InsForge 数据库。
+
+**逻辑：**
+
+- 创建 `profiles` 表
+- Server Actions（读取/更新资料）
+- 文件上传到 InsForge Storage
+- RLS 策略（用户只能访问自己的资料）
+
+---
+
+### 05 职位列表 — 完整 UI
+
+职位列表页面，使用模拟数据。
+
+**UI：**
+
+- 职位表格（标题、公司、地点、匹配分数、状态）
+- 筛选器（按状态、匹配分数）
+- 排序选项
+- 空状态
+
+---
+
+### 06 职位详情 — 完整 UI
+
+职位详情页面，使用模拟数据。
+
+**UI：**
+
+- 职位信息卡片（标题、公司、地点）
+- 匹配详情卡片（分数、分解）
+- 职位描述
+- 申请链接按钮
+- 简历操作区（生成定制简历）
+
+---
+
+### 07 职位管理 — 逻辑
+
+连接职位 UI 到数据库。
+
+**逻辑：**
+
+- 创建 `jobs` 表
+- Server Actions（查询、更新、删除职位）
+- RLS 策略
+- 申请状态更新
+
+---
+
+## 第三阶段 — AI 功能
+
+### 08 职位搜索与匹配
+
+LinkedIn 职位搜索和 AI 匹配评分。
+
+**逻辑：**
+
+- Browserbase 会话管理
+- LinkedIn 职位抓取（Stagehand）
+- GPT-4o 匹配评分
+- AgentSpan 任务编排
+- 职位保存到数据库
+
+---
+
+### 09 简历生成与定制
+
+基于用户资料生成简历，并为特定职位定制。
+
+**UI：**
+
+- 简历列表页面（`/resumes`）
+- 简历预览
+- 定制简历操作按钮
+
+**逻辑：**
+
+- 创建 `resumes` 表
+- 简历生成代理（GPT-4o）
+- PDF 生成和存储
+- 定制简历逻辑（针对职位描述优化）
+
+---
+
+## 第四阶段 — 申请跟踪
+
+### 10 申请记录
+
+申请记录页面和状态跟踪。
+
+**UI：**
+
+- 申请记录页面（`/applications`）
+- 申请状态徽章
+- Browserbase 录制回放链接
+
+**逻辑：**
+
+- 创建 `applications` 表
+- 申请记录创建
+- 状态更新
+- AgentSpan 自动申请（实验）
+
+---
+
+## 功能统计
+
+| 阶段   | 名称         | 功能数 |
+| ------ | ------------ | ------ |
+| 第一   | 基础设施     | 2      |
+| 第二   | 核心页面     | 5      |
+| 第三   | AI 功能      | 2      |
+| 第四   | 申请跟踪     | 1      |
+| **合计** |              | **10** |

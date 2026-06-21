@@ -1,20 +1,20 @@
 ---
-description: Instructions building apps with MCP
+description: 使用 MCP 构建应用的指令
 globs: *
 alwaysApply: true
 ---
 
 <!-- BEGIN:nextjs-agent-rules -->
 
-# This is NOT the Next.js you know
+# 这不是你熟悉的 Next.js
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+此版本有重大变更 — API、约定和文件结构可能都与你的训练数据不同。在编写任何代码之前，请先阅读 `node_modules/next/dist/docs/` 中的相关指南。注意弃用通知。
 
 <!-- END:nextjs-agent-rules -->
 
-## Read Before Anything Else
+## 实现前必须先阅读
 
-Read in this exact order before any implementation:
+按以下顺序阅读，然后再进行任何实现：
 
 1. context-driven-dev-main/context/project-overview.md
 2. context-driven-dev-main/context/architecture.md
@@ -26,180 +26,179 @@ Read in this exact order before any implementation:
 8. context-driven-dev-main/context/build-plan.md
 9. context-driven-dev-main/context/progress-tracker.md
 
-## Rules That Never Change
+## 永不改变的规则
 
-- Never use hardcoded hex values or raw Tailwind color classes
-- Update `progress-tracker.md` and `ui-registry.md` after every feature
-- Before any third party library — load its installed skill first,
-  then read `context-driven-dev-main/context/library-docs.md` for project-specific rules
-- If the same problem persists after one corrective prompt —
-  stop immediately and run /recover
+- 永不使用硬编码十六进制值或原始 Tailwind 颜色类
+- 每个功能完成后更新 `progress-tracker.md` 和 `ui-registry.md`
+- 使用任何第三方库之前 — 先加载其已安装的技能，
+  然后阅读 `context-driven-dev-main/context/library-docs.md` 了解项目特定规则
+- 如果同一个问题在一次纠正提示后仍然存在 —
+  立即停止并运行 /recover
 
-## Invariants — Never Violate These
+## 绝对不可违反的约束
 
-- API routes contain no UI logic. Components contain no DB logic.
-- Agent code in agent/ never imports from components/ or actions/
-- Server Actions never call agent functions — only API routes call agent functions
-- All InsForge DB writes from the agent go through lib/insforge-server.ts only
-- Easy Apply is never touched — external apply URLs only
-- Every Stagehand act() call is wrapped in try/catch
-- Match threshold always comes from MATCH_THRESHOLD in `lib/utils.ts`
-- AgentSpan step IDs always use format apply-{job_id}
+- API 路由不包含 UI 逻辑。组件不包含数据库逻辑。
+- `agent/` 中的代理代码永不从 `components/` 或 `actions/` 导入
+- Server Actions 永不调用代理函数 — 仅 API 路由调用代理函数
+- 所有代理的 InsForge 数据库写入仅通过 `lib/insforge-server.ts`
+- 永不触碰 Easy Apply — 仅使用外部申请链接
+- 每个 Stagehand `act()` 调用都包裹在 try/catch 中
+- 匹配阈值始终来自 `lib/utils.ts` 中的 `MATCH_THRESHOLD`
+- AgentSpan 步骤 ID 始终使用格式 `apply-{job_id}`
 
-## Available Skills
+## 可用技能
 
-- `/architect` — before any complex feature. Think before building.
-- `/imprint` — after any new UI component. Capture patterns.
-- `/review` — before demo or when something feels off.
-- `/recover` — when something breaks after one failed correction.
-- `/remember save` — when a feature spans multiple sessions.
-- `/remember restore` — when returning after a multi-session feature.
+- `/architect` — 任何复杂功能之前。先思考再构建。
+- `/imprint` — 任何新 UI 组件之后。捕获模式。
+- `/review` — 演示之前或感觉不对时。
+- `/recover` — 一次纠正后仍有问题时。
+- `/remember save` — 功能跨多个会话时。
+- `/remember restore` — 返回跨会话功能时。
 
-# InsForge SDK Documentation - Overview
+# InsForge SDK 文档 - 概览
 
-## What is InsForge?
+## 什么是 InsForge？
 
-Backend-as-a-service (BaaS) platform providing:
+后端即服务（BaaS）平台，提供：
 
-- **Database**: PostgreSQL with PostgREST API
-- **Authentication**: Email/password + OAuth (Google, GitHub)
-- **Storage**: File upload/download
-- **AI**: OpenRouter key provisioning and model catalog for direct OpenAI-compatible integrations
-- **Functions**: Serverless function deployment
-- **Realtime**: WebSocket pub/sub (database + client events)
+- **数据库**：PostgreSQL + PostgREST API
+- **认证**：邮箱/密码 + OAuth（Google、GitHub）
+- **存储**：文件上传/下载
+- **AI**：OpenRouter 密钥配置和模型目录，支持直接 OpenAI 兼容集成
+- **函数**：无服务器函数部署
+- **实时通信**：WebSocket 发布/订阅（数据库 + 客户端事件）
 
-## Installation
+## 安装
 
-The following is a step-by-step guide to installing and using the InsForge TypeScript SDK for Web applications. If you are building other types of applications, please refer to:
-- [Swift SDK documentation](/sdks/swift/overview) for iOS, macOS, tvOS, and watchOS applications.
-- [Kotlin SDK documentation](/sdks/kotlin/overview) for Android applications.
-- [REST API documentation](/sdks/rest/overview) for direct HTTP API access.
+以下是安装和使用 InsForge TypeScript SDK 构建 Web 应用的分步指南。如果你正在构建其他类型的应用，请参考：
+- [Swift SDK 文档](/sdks/swift/overview) — 适用于 iOS、macOS、tvOS 和 watchOS 应用
+- [Kotlin SDK 文档](/sdks/kotlin/overview) — 适用于 Android 应用
+- [REST API 文档](/sdks/rest/overview) — 直接 HTTP API 访问
 
-### 🚨 CRITICAL: Follow these steps in order
+### 严重警告：必须按顺序执行以下步骤
 
-### Step 1: Download Template
+### 步骤 1：下载模板
 
-Use the `download-template` MCP tool to create a new project with your backend URL and anon key pre-configured.
+使用 `download-template` MCP 工具创建一个预配置了后端 URL 和匿名密钥的新项目。
 
-### Step 2: Install SDK
+### 步骤 2：安装 SDK
 
 ```bash
 npm install @insforge/sdk@latest
 ```
 
-### Step 3: Create SDK Client
+### 步骤 3：创建 SDK 客户端
 
-You must create a client instance using `createClient()` with your base URL and anon key:
+你必须使用 `createClient()` 创建客户端实例，传入基础 URL 和匿名密钥：
 
 ```javascript
 import { createClient } from '@insforge/sdk';
 
 const client = createClient({
-  baseUrl: 'https://your-app.region.insforge.app',  // Your InsForge backend URL
-  anonKey: 'your-anon-key-here'       // Get this from backend metadata
+  baseUrl: 'https://your-app.region.insforge.app',  // 你的 InsForge 后端 URL
+  anonKey: 'your-anon-key-here'       // 从后端元数据获取
 });
-
 ```
 
-**API BASE URL**: Your API base URL is `https://your-app.region.insforge.app`.
+**API 基础 URL**：你的 API 基础 URL 是 `https://your-app.region.insforge.app`。
 
-## Getting Detailed Documentation
+## 获取详细文档
 
-### 🚨 CRITICAL: Always Fetch Documentation Before Writing Code
+### 严重警告：编写代码前必须先获取文档
 
-InsForge provides official SDKs and REST APIs, use them to interact with InsForge services from your application code.
+InsForge 提供官方 SDK 和 REST API，使用它们从应用代码中与 InsForge 服务交互。
 
-- [TypeScript SDK](/sdks/typescript/overview) - JavaScript/TypeScript
-- [Swift SDK](/sdks/swift/overview) - iOS, macOS, tvOS, and watchOS
-- [Kotlin SDK](/sdks/kotlin/overview) - Android and Kotlin Multiplatform
-- [REST API](/sdks/rest/overview) - Direct HTTP API access
+- [TypeScript SDK](/sdks/typescript/overview) — JavaScript/TypeScript
+- [Swift SDK](/sdks/swift/overview) — iOS、macOS、tvOS 和 watchOS
+- [Kotlin SDK](/sdks/kotlin/overview) — Android 和 Kotlin 多平台
+- [REST API](/sdks/rest/overview) — 直接 HTTP API 访问
 
-Before writing or editing any InsForge integration code, you **MUST** call the `fetch-docs` or `fetch-sdk-docs` MCP tool to get the latest SDK documentation. This ensures you have accurate, up-to-date implementation patterns.
+在编写或编辑任何 InsForge 集成代码之前，你**必须**调用 `fetch-docs` 或 `fetch-sdk-docs` MCP 工具获取最新的 SDK 文档。这确保你拥有准确、最新的实现模式。
 
-### Use the InsForge `fetch-docs` MCP tool to get specific SDK documentation:
+### 使用 InsForge `fetch-docs` MCP 工具获取特定 SDK 文档：
 
-Available documentation types:
+可用文档类型：
 
-- `"instructions"` - Essential backend setup (START HERE)
-- `"real-time"` - Real-time pub/sub (database + client events) via WebSockets
-- `"db-sdk-typescript"` - Database operations with TypeScript SDK
-- **Authentication** - Choose based on implementation:
-  - `"auth-sdk-typescript"` - TypeScript SDK methods for custom auth flows
-  - `"auth-components-react"` - Pre-built auth UI for React+Vite (singlepage App)
-  - `"auth-components-react-router"` - Pre-built auth UI for React(Vite+React Router) (Multipage App)
-  - `"auth-components-nextjs"` - Pre-built auth UI for Nextjs (SSR App)
-- `"storage-sdk"` - File storage operations
-- `"functions-sdk"` - Serverless functions invocation
-- `"ai-integration-sdk"` - AI integration with the provisioned OpenRouter key and OpenAI SDK
-- `"real-time"` - Real-time pub/sub (database + client events) via WebSockets
-- `"deployment"` - Deploy frontend applications via MCP tool
+- `"instructions"` — 后端设置要点（从这里开始）
+- `"real-time"` — 通过 WebSocket 的实时发布/订阅（数据库 + 客户端事件）
+- `"db-sdk-typescript"` — 使用 TypeScript SDK 进行数据库操作
+- **认证** — 根据实现选择：
+  - `"auth-sdk-typescript"` — 自定义认证流程的 TypeScript SDK 方法
+  - `"auth-components-react"` — React+Vite 的预构建认证 UI（单页应用）
+  - `"auth-components-react-router"` — React(Vite+React Router) 的预构建认证 UI（多页应用）
+  - `"auth-components-nextjs"` — Next.js 的预构建认证 UI（SSR 应用）
+- `"storage-sdk"` — 文件存储操作
+- `"functions-sdk"` — 无服务器函数调用
+- `"ai-integration-sdk"` — 使用配置的 OpenRouter 密钥和 OpenAI SDK 进行 AI 集成
+- `"real-time"` — 通过 WebSocket 的实时发布/订阅（数据库 + 客户端事件）
+- `"deployment"` — 通过 MCP 工具部署前端应用
 
-These documentations are mostly for TypeScript SDK. For other languages, you can also use `fetch-sdk-docs` mcp tool to get specific documentation.
+这些文档主要是 TypeScript SDK。对于其他语言，你也可以使用 `fetch-sdk-docs` MCP 工具获取特定文档。
 
-### Use the InsForge `fetch-sdk-docs` MCP tool to get specific SDK documentation
+### 使用 InsForge `fetch-sdk-docs` MCP 工具获取特定 SDK 文档
 
-You can fetch sdk documentation using the `fetch-sdk-docs` MCP tool with specific feature type and language.
+你可以使用 `fetch-sdk-docs` MCP 工具，通过特定功能类型和语言获取 SDK 文档。
 
-Available feature types:
-- db - Database operations
-- storage - File storage operations
-- functions - Serverless functions invocation
-- auth - User authentication
-- ai - AI integration with the provisioned OpenRouter key and OpenAI SDK
-- realtime - Real-time pub/sub (database + client events) via WebSockets
+可用功能类型：
+- db — 数据库操作
+- storage — 文件存储操作
+- functions — 无服务器函数调用
+- auth — 用户认证
+- ai — 使用配置的 OpenRouter 密钥和 OpenAI SDK 进行 AI 集成
+- realtime — 通过 WebSocket 的实时发布/订阅（数据库 + 客户端事件）
 
-Available languages:
-- typescript - JavaScript/TypeScript SDK
-- swift - Swift SDK (for iOS, macOS, tvOS, and watchOS)
-- kotlin - Kotlin SDK (for Android and JVM applications)
-- rest-api - REST API
+可用语言：
+- typescript — JavaScript/TypeScript SDK
+- swift — Swift SDK（适用于 iOS、macOS、tvOS 和 watchOS）
+- kotlin — Kotlin SDK（适用于 Android 和 JVM 应用）
+- rest-api — REST API
 
-## When to Use SDK vs MCP Tools
+## 何时使用 SDK vs MCP 工具
 
-### Always SDK for Application Logic:
+### 应用逻辑始终使用 SDK：
 
-- Authentication (register, login, logout, profiles)
-- Database CRUD (select, insert, update, delete)
-- Storage operations (upload, download files)
-- AI integration via the provisioned OpenRouter key with the OpenAI SDK or OpenRouter HTTP API
-- Serverless function invocation
+- 认证（注册、登录、登出、个人资料）
+- 数据库 CRUD（查询、插入、更新、删除）
+- 存储操作（上传、下载文件）
+- 通过配置的 OpenRouter 密钥使用 OpenAI SDK 或 OpenRouter HTTP API 进行 AI 集成
+- 无服务器函数调用
 
-### Use MCP Tools for Infrastructure:
+### 基础设施使用 MCP 工具：
 
-- Project scaffolding (`download-template`) - Download starter templates with InsForge integration
-- Backend setup and metadata (`get-backend-metadata`)
-- Database schema management (`run-raw-sql`, `get-table-schema`)
-- Storage bucket creation (`create-bucket`, `list-buckets`, `delete-bucket`)
-- Serverless function deployment (`create-function`, `update-function`, `delete-function`)
-- Frontend deployment (`create-deployment`) - Deploy frontend apps to InsForge hosting
+- 项目脚手架（`download-template`）— 下载预集成 InsForge 的入门模板
+- 后端设置和元数据（`get-backend-metadata`）
+- 数据库模式管理（`run-raw-sql`、`get-table-schema`）
+- 存储桶创建（`create-bucket`、`list-buckets`、`delete-bucket`）
+- 无服务器函数部署（`create-function`、`update-function`、`delete-function`）
+- 前端部署（`create-deployment`）— 将前端应用部署到 InsForge 托管
 
-## Important Notes
+## 重要说明
 
-- For auth: use `auth-sdk` for custom UI, or framework-specific components for pre-built UI
-- SDK returns `{data, error}` structure for all operations
-- Database inserts require array format: `[{...}]`
-- Serverless functions have single endpoint (no subpaths)
-- Storage: Upload files to buckets, store URLs in database
-- AI integrations should call OpenRouter directly with `baseURL: "https://openrouter.ai/api/v1"` and a server-side `OPENROUTER_API_KEY`
-- **EXTRA IMPORTANT**: Use Tailwind CSS v4. Tokens are defined with `@theme` in `globals.css` — no `tailwind.config.ts` needed for colors or tokens.
+- 认证：自定义 UI 使用 `auth-sdk`，预构建 UI 使用框架特定组件
+- SDK 所有操作返回 `{data, error}` 结构
+- 数据库插入需要数组格式：`[{...}]`
+- 无服务器函数只有单一端点（无子路径）
+- 存储：上传文件到桶中，将 URL 存储在数据库中
+- AI 集成应直接调用 OpenRouter，使用 `baseURL: "https://openrouter.ai/api/v1"` 和服务端 `OPENROUTER_API_KEY`
+- **特别重要**：使用 Tailwind CSS v4。令牌使用 `@theme` 在 `globals.css` 中定义 — 颜色或令牌不需要 `tailwind.config.ts`。
 
 <!-- INSFORGE:START -->
-## InsForge backend
+## InsForge 后端
 
-This project uses [InsForge](https://insforge.dev): an all-in-one, open-source Postgres-based backend (BaaS) that gives this app a database, authentication, file storage, edge functions, realtime, an AI model gateway, and payments through one platform.
+本项目使用 [InsForge](https://insforge.dev)：一个一体化、开源的基于 Postgres 的后端（BaaS），为本应用提供数据库、认证、文件存储、边缘函数、实时通信、AI 模型网关和支付功能。
 
-- **Project:** **job_pilot** (API base `https://9g5p2i2e.us-east.insforge.app`)
-- **Skills:** these InsForge skills are installed for supported coding agents. Reach for them before implementing any InsForge feature instead of guessing the API:
-  - `insforge`: app code with the `@insforge/sdk` client (database CRUD, auth, storage, edge functions, realtime, AI, email, and Stripe payments).
-  - `insforge-cli`: backend and infrastructure via the `insforge` CLI (projects, SQL, migrations, RLS policies, storage buckets, functions, secrets, payment setup, schedules, deploys).
-  - `insforge-debug`: diagnosing failures (SDK/HTTP errors, RLS denials, auth and OAuth issues) and running security or performance audits.
-  - `insforge-integrations`: wiring external auth providers (Clerk, Auth0, WorkOS, Better Auth, etc.) for JWT-based RLS, or the OKX x402 payment facilitator.
-  - `find-skills`: discovering additional skills on demand.
-- **Credentials:** app code reads keys from `.env.local`; the CLI reads `.insforge/project.json`. Never hardcode or commit keys.
+- **项目：** **job_pilot**（API 基础 URL `https://9g5p2i2e.us-east.insforge.app`）
+- **技能：** 以下 InsForge 技能已为支持的编码代理安装。实现任何 InsForge 功能时请优先使用它们，而不是猜测 API：
+  - `insforge`：使用 `@insforge/sdk` 客户端编写应用代码（数据库 CRUD、认证、存储、边缘函数、实时通信、AI、邮件和 Stripe 支付）。
+  - `insforge-cli`：通过 `insforge` CLI 管理后端和基础设施（项目、SQL、迁移、RLS 策略、存储桶、函数、密钥、支付设置、定时任务、部署）。
+  - `insforge-debug`：诊断故障（SDK/HTTP 错误、RLS 拒绝、认证和 OAuth 问题）以及运行安全或性能审计。
+  - `insforge-integrations`：接入外部认证提供商（Clerk、Auth0、WorkOS、Better Auth 等）用于基于 JWT 的 RLS，或 OKX x402 支付中介。
+  - `find-skills`：按需发现更多技能。
+- **凭据：** 应用代码从 `.env.local` 读取密钥；CLI 读取 `.insforge/project.json`。永不硬编码或提交密钥。
 
-Key patterns:
+关键模式：
 
-- Database inserts take an array: `insert([{ ... }])`.
-- Reference users with `auth.users(id)`; use `auth.uid()` in RLS policies.
-- For storage uploads, persist both the returned `url` and `key`.
+- 数据库插入使用数组格式：`insert([{ ... }])`。
+- 引用用户使用 `auth.users(id)`；在 RLS 策略中使用 `auth.uid()`。
+- 存储上传时，同时保存返回的 `url` 和 `key`。
 <!-- INSFORGE:END -->

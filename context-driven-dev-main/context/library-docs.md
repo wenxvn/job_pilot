@@ -1,143 +1,246 @@
-<!-- Library docs: key usage patterns for the libraries in this project -->
+# 库文档
 
-# Library Docs
-
-Project-specific usage patterns for every third party library in this project. This file only covers how we use each library in this specific project — rules, patterns, and constraints specific to this codebase.
-
-Read the relevant section before implementing any feature that touches these libraries.
+本项目中每个第三方库的特定使用模式。在实现涉及这些库的功能之前，请阅读相关部分。
 
 ---
 
-## Before Using Any Library
+## 使用任何库之前
 
-Before implementing any feature that uses a third party library:
+在实现任何使用第三方库的功能之前：
 
-1. **Check AGENTS.md** at the project root — it lists every skill installed for this project. Skills contain up-to-date API documentation and usage patterns specific to this codebase.
-2. **Check if an MCP server is configured** for that library. If one is available — use it before falling back to general knowledge.
-3. **Read this file** for project-specific patterns that override general library knowledge.
+1. **检查项目根目录的 AGENTS.md** — 它列出了为此项目安装的每个技能
+2. **检查是否为该库配置了 MCP 服务器** — 如果可用，优先使用
+3. **阅读此文件** — 了解覆盖通用库知识的项目特定模式
 
-The order of authority is:
+权威性顺序：
 
 ```
-MCP server (real-time docs) → Skills via AGENTS.md → This file (project rules) → General training knowledge
+MCP 服务器（实时文档）→ AGENTS.md 技能 → 此文件（项目规则）→ 通用训练知识
 ```
-
-Never rely on general training knowledge alone for library APIs — they change frequently and training data may be outdated.
 
 ---
 
-## [Library 1 — e.g. Database Client]
+## InsForge SDK
 
-[One line on what it does in this project.]
+后端即服务平台，提供数据库、认证、存储、AI、实时通信等。
 
-### [Usage Pattern 1 — e.g. Client vs Server]
+### 客户端 vs 服务端
 
 ```typescript
-// [Context — e.g. browser context only]
-[code example]
+// 客户端上下文（浏览器）
+'use client'
+import { createClient } from '@insforge/sdk'
+const client = createClient({
+  baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
+  anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!
+})
 ```
 
 ```typescript
-// [Context — e.g. server context only]
-[code example]
+// 服务端上下文
+import { createClient } from '@insforge/sdk'
+const client = createClient({
+  baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
+  anonKey: process.env.INSFORGE_SERVICE_ROLE_KEY!
+})
 ```
 
-**Rules:**
+**规则：**
 
-- [e.g. Never use browser client in server context]
-- [e.g. Always scope queries to the current user — never query without a user filter]
+- 永不混用客户端/服务端客户端
+- 所有数据库写入通过 `lib/insforge-server.ts`
+- 始终处理错误返回 — 永不假设成功
+
+### 数据库查询
+
+```typescript
+// 读取
+const { data, error } = await client
+  .from('jobs')
+  .select('*')
+  .eq('user_id', userId)
+  .order('created_at', { ascending: false })
+
+// 写入（数组格式）
+const { data, error } = await client
+  .from('jobs')
+  .insert([{ title, company, user_id: userId }])
+
+// 更新
+const { data, error } = await client
+  .from('jobs')
+  .update({ status: 'applied' })
+  .eq('id', jobId)
+```
+
+**规则：**
+
+- 数据库插入必须使用数组格式 `insert([{ ... }])`
+- 始终限定查询到当前用户
+- 使用 `.single()` 期望恰好一行时
+
+### 存储操作
+
+```typescript
+// 上传
+const { data, error } = await client.storage
+  .from('resumes')
+  .upload(`${userId}/${resumeId}.pdf`, fileBuffer)
+
+// 获取 URL
+const { data: { publicUrl } } = client.storage
+  .from('resumes')
+  .getPublicUrl(`${userId}/${resumeId}.pdf`)
+```
+
+**规则：**
+
+- 文件覆盖使用 `upsert: true`
+- 永不写入磁盘 — 始终直接上传 buffer
+- 同时保存返回的 `url` 和 `key`
 
 ---
 
-### [Usage Pattern 2 — e.g. Queries]
+## OpenAI / OpenRouter
+
+用于匹配评分、简历定制、表单填写代理。
+
+### 基本用法
 
 ```typescript
-// [Read example]
-[code example]
+import OpenAI from 'openai'
 
-// [Write example]
-[code example]
+const openai = new OpenAI({
+  baseURL: 'https://openrouter.ai/api/v1',
+  apiKey: process.env.OPENROUTER_API_KEY
+})
+
+const response = await openai.chat.completions.create({
+  model: 'gpt-4o',
+  messages: [{ role: 'user', content: prompt }],
+  response_format: { type: 'json_object' }
+})
 ```
 
-**Rules:**
+**规则：**
 
-- [e.g. Always handle the error return — never assume success]
-- [e.g. Use .single() when expecting exactly one row]
+- 模型始终使用 `gpt-4o` — 永不切换模型
+- 结构化数据始终使用 `response_format: json_object`
+- 始终将响应内容作为字符串解析 — 包裹在 try/catch 中
+
+### 温度设置
+
+| 用途             | 温度  |
+| ---------------- | ----- |
+| 评分/提取        | 0.3   |
+| 创意生成         | 0.7   |
 
 ---
 
-### [Usage Pattern 3 — e.g. Storage / File Upload]
+## Browserbase
+
+云浏览器服务，用于 LinkedIn 认证会话和职位抓取。
+
+### 会话管理
 
 ```typescript
-[code example]
+import { Browserbase } from '@browserbasehq/sdk'
+
+const bb = new Browserbase({ apiKey: process.env.BROWSERBASE_API_KEY })
+
+// 创建会话
+const session = await bb.sessions.create({
+  projectId: process.env.BROWSERBASE_PROJECT_ID!,
+  browserSettings: {
+    context: { id: contextId } // 使用保存的上下文
+  }
+})
 ```
 
-**Rules:**
+**规则：**
 
-- [e.g. Always use upsert: true for file overwrites]
-- [e.g. Never write files to disk — always upload buffer directly]
+- 始终使用保存的上下文 ID 进行 LinkedIn 认证
+- 会话录制 URL 保存到申请记录
+- 高级隐身模式：`BROWSERBASE_ADVANCED_STEALTH=true`
 
 ---
 
-## [Library 2 — e.g. AI Model]
+## Stagehand
 
-[One line on what it does in this project.]
+AI 浏览器代理，基于 Browserbase。
 
-### [Usage Pattern 1 — e.g. Structured JSON Response]
+### DOM 操作
 
 ```typescript
-[code example]
+import { Stagehand } from 'stagehand'
+
+const stagehand = new Stagehand({ session })
+
+// 导航
+await page.goto(url)
+
+// 填写表单
+await page.act({ action: 'fill', selector: '#email', value: email })
+
+// 点击
+await page.act({ action: 'click', selector: 'button[type="submit"]' })
 ```
 
-**Rules:**
+**规则：**
 
-- [e.g. Model is always 'gpt-4o' — never switch models]
-- [e.g. Always use response_format: json_object for structured data]
-- [e.g. Always parse response content as string — wrap in try/catch]
+- 每个 `act()` 调用必须包裹在 try/catch 中
+- Easy Apply 使用 DOM 模式
+- 外部 ATS 使用混合模式
 
 ---
 
-### [Usage Pattern 2 — e.g. Temperature Settings]
+## AgentSpan
 
-| Use case                    | Temperature |
-| --------------------------- | ----------- |
-| [e.g. Scoring / extraction] | [e.g. 0.3]  |
-| [e.g. Creative generation]  | [e.g. 0.7]  |
+持久化代理编排。
+
+### 步骤 ID 格式
+
+```
+apply-{job_id}  // 例如：apply-abc123
+```
+
+**规则：**
+
+- 步骤 ID 始终使用格式 `apply-{job_id}`
+- 幂等性通过步骤 ID 保证
 
 ---
 
-## [Library 3 — e.g. Analytics]
+## shadcn/ui
 
-[One line on what it does in this project.]
+基于 Radix UI 的组件库。
 
-### [Usage Pattern 1 — e.g. Client Setup]
+### 安装组件
 
-```typescript
-[code example]
+```bash
+npx shadcn@latest add button
+npx shadcn@latest add card
 ```
 
-### [Usage Pattern 2 — e.g. Server Setup]
+**规则：**
 
-```typescript
-[code example]
-```
-
-**Rules:**
-
-- [e.g. Always call shutdown() in server-side functions — events are lost without it]
-- [e.g. Event names must match exactly the list in code-standards.md]
+- 使用 Tailwind CSS v4 令牌进行样式设置
+- 颜色使用 `@theme` 中定义的令牌
+- 永不使用 Tailwind 内置颜色类
 
 ---
 
-## [Library 4]
+## Lucide React
 
-[One line on what it does in this project.]
+图标库。
 
 ```typescript
-[code example]
+import { Search, Briefcase, FileText } from 'lucide-react'
+
+<Search className="w-4 h-4" />
 ```
 
-**Rules:**
+**规则：**
 
-- [rule]
-- [rule]
+- 图标大小统一：16px（`w-4 h-4`）、20px（`w-5 h-5`）、24px（`w-6 h-6`）
+- 颜色继承父元素文本颜色

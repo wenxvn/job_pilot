@@ -1,84 +1,82 @@
-<!-- UI tokens: the design system values the agent must use for all styling -->
+# UI 令牌
 
-# UI Tokens
-
-Design tokens for [PROJECT NAME]. All colors, typography, spacing, and component values extracted from the delivered design. Use these exact values throughout the codebase — never hardcode colors or use raw Tailwind color classes in components.
+JobPilot 设计系统令牌。所有颜色、排版、间距和组件值从设计中提取。在整个代码库中使用这些精确值 — 永不硬编码颜色或在组件中使用原始 Tailwind 颜色类。
 
 ---
 
-## How to Use
+## 如何使用
 
-This project uses **Tailwind CSS v4**. All design tokens are defined using the `@theme` directive in `app/globals.css`. No `tailwind.config.ts` needed for colors or tokens.
+本项目使用 **Tailwind CSS v4**。所有设计令牌使用 `@theme` 指令在 `app/globals.css` 中定义。颜色或令牌不需要 `tailwind.config.ts`。
 
-Tailwind v4 automatically generates utility classes from `@theme` variables:
+Tailwind v4 自动从 `@theme` 变量生成实用类：
 
 - `--color-accent` → `bg-accent`, `text-accent`, `border-accent`
 - `--color-surface` → `bg-surface`, `text-surface`, `border-surface`
 
 ```tsx
-// Correct — uses generated utility classes
+// 正确 — 使用生成的实用类
 className="bg-surface text-text-primary border-border"
 
-// Also correct — references CSS variable directly
+// 也正确 — 直接引用 CSS 变量
 style={{ color: 'var(--color-text-primary)' }}
 
-// Never — hardcoded hex values
+// 永不 — 硬编码十六进制值
 className="bg-[#F6F7FB] text-[#101828]"
 
-// Never — raw Tailwind color classes
+// 永不 — 原始 Tailwind 颜色类
 className="bg-purple-500 text-gray-600"
 ```
 
 ---
 
-## globals.css — Complete Token Definition
+## globals.css — 完整令牌定义
 
 ```css
 @import "tailwindcss";
 
 @theme {
-  /* Font */
-  --font-sans: "[YOUR FONT — e.g. Inter]", sans-serif;
+  /* 字体 */
+  --font-sans: "Inter", sans-serif;
 
-  /* Page and surface backgrounds */
-  --color-background: [e.g. #F6F7FB];
-  --color-surface: [e.g. #FFFFFF];
-  --color-surface-secondary: [e.g. #F9FAFB];
+  /* 页面和表面背景 */
+  --color-background: #F6F7FB;
+  --color-surface: #FFFFFF;
+  --color-surface-secondary: #F9FAFB;
 
-  /* Borders */
-  --color-border: [e.g. #E7EAF3];
-  --color-border-light: [e.g. #E5E7EB];
+  /* 边框 */
+  --color-border: #E7EAF3;
+  --color-border-light: #E5E7EB;
 
-  /* Text */
-  --color-text-primary: [e.g. #101828];
-  --color-text-secondary: [e.g. #6A7282];
-  --color-text-muted: [e.g. #99A1AF];
+  /* 文本 */
+  --color-text-primary: #101828;
+  --color-text-secondary: #6A7282;
+  --color-text-muted: #99A1AF;
 
-  /* Primary accent */
-  --color-accent: [e.g. #7C5CFC];
-  --color-accent-dark: [e.g. #5E4CFF];
-  --color-accent-light: [e.g. #F3E8FF];
-  --color-accent-foreground: [e.g. #FFFFFF];
+  /* 主色调 */
+  --color-accent: #7C5CFC;
+  --color-accent-dark: #5E4CFF;
+  --color-accent-light: #F3E8FF;
+  --color-accent-foreground: #FFFFFF;
 
-  /* Success */
-  --color-success: [e.g. #10B981];
-  --color-success-light: [e.g. #D0FAE5];
-  --color-success-foreground: [e.g. #007A55];
+  /* 成功 */
+  --color-success: #10B981;
+  --color-success-light: #D0FAE5;
+  --color-success-foreground: #007A55;
 
-  /* Info */
-  --color-info: [e.g. #61A8FF];
-  --color-info-light: [e.g. #DBEAFE];
-  --color-info-foreground: [e.g. #155DFC];
+  /* 信息 */
+  --color-info: #61A8FF;
+  --color-info-light: #DBEAFE;
+  --color-info-foreground: #155DFC;
 
-  /* Warning */
-  --color-warning: [e.g. #FF8904];
-  --color-warning-foreground: [e.g. #FFFFFF];
+  /* 警告 */
+  --color-warning: #FF8904;
+  --color-warning-foreground: #FFFFFF;
 
-  /* Error */
-  --color-error: [e.g. #EF4444];
-  --color-error-foreground: [e.g. #FFFFFF];
+  /* 错误 */
+  --color-error: #EF4444;
+  --color-error-foreground: #FFFFFF;
 
-  /* Border radius */
+  /* 边框半径 */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -89,90 +87,90 @@ className="bg-purple-500 text-gray-600"
 
 ---
 
-## Color Usage Guide
+## 颜色使用指南
 
-### Page Layout
+### 页面布局
 
-| Element           | Token                  |
-| ----------------- | ---------------------- |
-| Page background   | `bg-background`        |
-| Card / surface    | `bg-surface`           |
-| Secondary surface | `bg-surface-secondary` |
-| Default border    | `border-border`        |
-| Light border      | `border-border-light`  |
+| 元素           | 令牌                  |
+| -------------- | --------------------- |
+| 页面背景       | `bg-background`       |
+| 卡片/表面      | `bg-surface`          |
+| 次要表面       | `bg-surface-secondary`|
+| 默认边框       | `border-border`       |
+| 浅色边框       | `border-border-light` |
 
-### Typography
+### 排版
 
-| Element                | Token                 |
-| ---------------------- | --------------------- |
-| Headings, primary text | `text-text-primary`   |
-| Secondary text, labels | `text-text-secondary` |
-| Placeholder, muted     | `text-text-muted`     |
+| 元素               | 令牌                  |
+| ------------------ | --------------------- |
+| 标题、主要文本     | `text-text-primary`   |
+| 次要文本、标签     | `text-text-secondary` |
+| 占位符、静音       | `text-text-muted`     |
 
-### Accent (Primary Color)
+### 主色调
 
-Used for: primary buttons, active nav items, focus rings
+用于：主按钮、活动导航项、焦点环
 
-| Element                | Token                    |
-| ---------------------- | ------------------------ |
-| Button background      | `bg-accent`              |
-| Button text            | `text-accent-foreground` |
-| Light badge background | `bg-accent-light`        |
+| 元素               | 令牌                     |
+| ------------------ | ------------------------ |
+| 按钮背景           | `bg-accent`              |
+| 按钮文本           | `text-accent-foreground` |
+| 浅色徽章背景       | `bg-accent-light`        |
 
-### Status Colors
+### 状态颜色
 
-| Status  | Background         | Text                      |
-| ------- | ------------------ | ------------------------- |
-| Success | `bg-success-light` | `text-success-foreground` |
-| Info    | `bg-info-light`    | `text-info-foreground`    |
-| Warning | `bg-warning`       | `text-warning-foreground` |
-| Error   | `bg-error`         | `text-error-foreground`   |
-
----
-
-## Typography
-
-| Element           | Size | Weight     | Line height | Color token           |
-| ----------------- | ---- | ---------- | ----------- | --------------------- |
-| Page heading      | [px] | [e.g. 700] | [px]        | `text-text-primary`   |
-| Section heading   | [px] | [e.g. 600] | [px]        | `text-text-primary`   |
-| Body text         | [px] | [e.g. 400] | [px]        | `text-text-primary`   |
-| Label             | [px] | [e.g. 500] | [px]        | `text-text-secondary` |
-| Muted / timestamp | [px] | [e.g. 400] | [px]        | `text-text-muted`     |
-
-Font family: **[YOUR FONT]** — import via `next/font/google`, never use a fallback system font.
+| 状态  | 背景               | 文本                      |
+| ----- | ------------------ | ------------------------- |
+| 成功  | `bg-success-light` | `text-success-foreground` |
+| 信息  | `bg-info-light`    | `text-info-foreground`    |
+| 警告  | `bg-warning`       | `text-warning-foreground` |
+| 错误  | `bg-error`         | `text-error-foreground`   |
 
 ---
 
-## Spacing
+## 排版
 
-| Token       | Value  | Usage                 |
-| ----------- | ------ | --------------------- |
-| `gap-2`     | 8px    | Badge and tag gaps    |
-| `gap-4`     | 16px   | Section internal gaps |
-| `gap-6`     | 24px   | Between sections      |
-| `p-4`       | 16px   | Card padding          |
-| `p-6`       | 24px   | Large card padding    |
-| `px-4 py-2` | 16/8px | Button padding        |
-| `px-3 py-1` | 12/4px | Badge padding         |
+| 元素         | 大小 | 粗细 | 行高 | 颜色令牌              |
+| ------------ | ---- | ---- | ---- | --------------------- |
+| 页面标题     | 24px | 700  | 32px | `text-text-primary`   |
+| 区域标题     | 16px | 600  | 24px | `text-text-primary`   |
+| 正文文本     | 14px | 400  | 20px | `text-text-primary`   |
+| 标签         | 12px | 500  | 16px | `text-text-secondary` |
+| 静音/时间戳  | 12px | 400  | 16px | `text-text-muted`     |
+
+字体：**Inter** — 通过 `next/font/google` 导入，永不使用后备系统字体。
 
 ---
 
-## Component Tokens
+## 间距
 
-### Cards
+| 令牌          | 值     | 用途           |
+| ------------- | ------ | -------------- |
+| `gap-2`       | 8px    | 徽章和标签间距 |
+| `gap-4`       | 16px   | 区域内部间距   |
+| `gap-6`       | 24px   | 区域之间间距   |
+| `p-4`         | 16px   | 卡片内边距     |
+| `p-6`         | 24px   | 大卡片内边距   |
+| `px-4 py-2`   | 16/8px | 按钮内边距     |
+| `px-3 py-1`   | 12/4px | 徽章内边距     |
+
+---
+
+## 组件令牌
+
+### 卡片
 
 ```
 background:    bg-surface
 border:        1px solid var(--color-border)
-border-radius: [e.g. rounded-2xl]
+border-radius: rounded-xl
 padding:       p-6
-box-shadow:    [e.g. 0px 1px 3px rgba(0,0,0,0.1)]
+box-shadow:    0px 1px 3px rgba(0,0,0,0.1)
 ```
 
-### Buttons
+### 按钮
 
-**Primary:**
+**主按钮：**
 
 ```
 background:    bg-accent
@@ -182,7 +180,7 @@ padding:       px-4 py-2
 font-weight:   font-medium
 ```
 
-**Secondary:**
+**次要按钮：**
 
 ```
 background:    bg-surface
@@ -192,7 +190,7 @@ border-radius: rounded-md
 padding:       px-4 py-2
 ```
 
-**Ghost:**
+**幽灵按钮：**
 
 ```
 background:    transparent
@@ -201,33 +199,34 @@ hover:         hover:bg-surface-secondary
 border-radius: rounded-md
 ```
 
-### Input Fields
+### 输入框
 
 ```
-background:  bg-surface
-border:      border border-border
+background:    bg-surface
+border:        1px solid var(--color-border)
 border-radius: rounded-md
-padding:     px-3 py-2
-text:        text-text-primary
-placeholder: text-text-muted
-focus:       ring-1 ring-accent
+padding:       px-3 py-2
+font-size:     text-sm
+focus:         ring-1 ring-accent border-accent
+placeholder:   placeholder:text-text-muted
 ```
 
-### Badges
+### 徽章
 
 ```
-border-radius: rounded-full
+background:    bg-accent-light
+text:          text-accent
+border-radius: rounded-full (pill)
 padding:       px-2 py-0.5
 font-size:     text-xs
 font-weight:   font-medium
 ```
 
----
+### 表格
 
-## Invariants
-
-- Never use hex values directly in components — always use CSS variables via Tailwind tokens
-- Font is [YOUR FONT] — always import via `next/font/google`, never use a fallback system font
-- Never use raw Tailwind color classes like `bg-purple-500` or `text-gray-600` — use project tokens only
-- The primary accent color is the only [color] — never use Tailwind's built-in color scale for it
-- All borders default to `--color-border` — never use `border-gray-*`
+```
+header:        text-xs font-medium text-text-secondary uppercase
+row:           text-sm text-text-primary
+border:        border-b border-border
+hover:         hover:bg-surface-secondary
+```

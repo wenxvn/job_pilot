@@ -1,188 +1,190 @@
-<!-- UI rules: how the interface behaves — layout, interactions, and component patterns -->
+# UI 规则
 
-# UI Rules
-
-Concise rules for building [PROJECT NAME] UI. Design assets are available — use them as the source of truth for visual decisions. These rules cover the most important patterns and constraints to keep the UI consistent without over-specifying every detail.
+JobPilot UI 构建的简洁规则。设计资产可用 — 使用它们作为视觉决策的真实来源。这些规则涵盖了保持 UI 一致性的最重要模式和约束。
 
 ---
 
-## Font
+## 字体
 
-Always import [YOUR FONT — e.g. Inter] via `next/font/google` in the root layout.
+始终在根布局中通过 `next/font/google` 导入 Inter。
 
 ```typescript
 import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 ```
 
-The `--font-sans` variable is already declared in `@theme` in globals.css. Apply the font variable class to the `<html>` tag in root layout. Never use system fonts as the primary font.
+`--font-sans` 变量已在 globals.css 的 `@theme` 中声明。将字体变量类应用到根布局的 `<html>` 标签。永不使用系统字体作为主字体。
 
 ---
 
-## Layout
+## 布局
 
-- Page max-width: [e.g. 1440px], centered
-- Main content area padding: [e.g. 32px on all sides]
-- Gap between page sections: [e.g. 24px]
-- Header height: [e.g. 64px], full width, [color] background, padding [e.g. 0 24px]
-- All pages use [top navbar / sidebar] only — [describe nav structure]
-
----
-
-## Navbar
-
-[List nav items in order — e.g. Dashboard, Jobs, Profile]
-
-- Active item: color `[token]`, font-weight [e.g. 500], [e.g. 14px]
-- Inactive item: color `[token]`, font-weight [e.g. 500], [e.g. 14px]
-- Active state indicator: [e.g. color change only / underline / left border]
-- Navbar background: [color], full viewport width
+- 页面最大宽度：1280px，居中
+- 主内容区内边距：24px
+- 页面区域间距：24px
+- 头部高度：64px，全宽，背景 `bg-surface`，内边距 `px-6`
+- 所有页面使用顶部导航栏
 
 ---
 
-## Cards
+## 导航栏
 
-Every content section lives in a card.
+导航项：Logo、Jobs（职位）、Resumes（简历）、Applications（申请记录）、用户头像下拉菜单
 
-```
-background:    [e.g. #FFFFFF]
-border:        1px solid [border token]
-border-radius: [e.g. 16px]
-padding:       [e.g. 24px]
-box-shadow:    [e.g. 0px 1px 3px rgba(0,0,0,0.1)]
-```
-
-Never use colored card backgrounds — always [color]. Color goes inside cards via badges, bars, and text, never on the card surface itself.
+- 活动项：颜色 `text-accent`，字重 500，14px
+- 非活动项：颜色 `text-text-secondary`，字重 500，14px
+- 活动状态指示：颜色变化
+- 导航栏背景：`bg-surface`，全视口宽度
+- 底部边框：`border-b border-border`
 
 ---
 
-## Typography Hierarchy
+## 卡片
 
-Three levels used consistently throughout:
-
-**Section headings** — card titles, page section titles
+每个内容区域都在卡片中。
 
 ```
-font-size:   [e.g. 16px]
-font-weight: [e.g. 600]
-color:       [text-primary token]
-line-height: [e.g. 24px]
+background:    bg-surface
+border:        1px solid var(--color-border)
+border-radius: rounded-xl
+padding:       p-6
+box-shadow:    0px 1px 3px rgba(0,0,0,0.1)
 ```
 
-**Body / primary content text**
+永不使用彩色卡片背景 — 始终使用 `bg-surface`。颜色通过卡片内的徽章、条形和文本体现，永不放在卡片表面本身。
+
+---
+
+## 排版层级
+
+三个级别贯穿始终使用：
+
+**区域标题** — 卡片标题、页面区域标题
 
 ```
-font-size:   [e.g. 14px]
-font-weight: [e.g. 500]
-color:       [text-primary token]
-line-height: [e.g. 20px]
+font-size:   16px
+font-weight: 600
+color:       text-text-primary
+line-height: 24px
 ```
 
-**Secondary / muted text** — labels, timestamps, subtitles
+**正文/主要内容文本**
 
 ```
-font-size:   [e.g. 12px]
-font-weight: [e.g. 400]
-color:       [text-muted token]
-line-height: [e.g. 16px]
+font-size:   14px
+font-weight: 500
+color:       text-text-primary
+line-height: 20px
+```
+
+**次要/静音文本** — 标签、时间戳、副标题
+
+```
+font-size:   12px
+font-weight: 400
+color:       text-text-muted
+line-height: 16px
 ```
 
 ---
 
-## Badges
+## 徽章
 
-All badges use `border-radius: 9999px` (pill shape) unless specified otherwise.
+所有徽章使用 `rounded-full`（药丸形状），除非另有说明。
 
 ```
-padding:     [e.g. 2px 8px]
-font-size:   [e.g. 12px]
-font-weight: [e.g. 500]
+padding:     px-2 py-0.5
+font-size:   12px
+font-weight: 500
 ```
 
-[Note any badge variants that break the pill rule — e.g. trend badges use border-radius: 4px]
+状态徽章变体：
+- 成功：`bg-success-light text-success-foreground`
+- 信息：`bg-info-light text-info-foreground`
+- 警告：`bg-warning text-warning-foreground`
+- 错误：`bg-error text-error-foreground`
 
 ---
 
-## Buttons
+## 按钮
 
-**Primary button:**
-
-```
-background:    [accent token]
-color:         [accent-foreground token]
-border-radius: [e.g. 8px]
-padding:       [e.g. 8px 16px]
-font-size:     [e.g. 14px]
-font-weight:   [e.g. 500]
-```
-
-**Secondary button:**
+**主按钮：**
 
 ```
-background:    [surface token]
-border:        1px solid [border token]
-color:         [text-primary token]
-border-radius: [e.g. 8px]
-padding:       [e.g. 8px 16px]
+background:    bg-accent
+color:         text-accent-foreground
+border-radius: rounded-md
+padding:       px-4 py-2
+font-size:     14px
+font-weight:   500
 ```
 
-**Ghost button:**
+**次要按钮：**
+
+```
+background:    bg-surface
+border:        1px solid border-border
+color:         text-text-primary
+border-radius: rounded-md
+padding:       px-4 py-2
+```
+
+**幽灵按钮：**
 
 ```
 background:    transparent
-color:         [text-secondary token]
-hover:         [surface-secondary token]
-border-radius: [e.g. 8px]
+color:         text-text-secondary
+hover:         hover:bg-surface-secondary
+border-radius: rounded-md
 ```
 
 ---
 
-## Form Inputs
+## 表单输入
 
 ```
-background:        [surface token]
-border:            1px solid [border token]
-border-radius:     [e.g. 8px]
-padding:           [e.g. 8px 12px]
-font-size:         [e.g. 14px]
-color:             [text-primary token]
-placeholder color: [text-muted token]
+background:        bg-surface
+border:            1px solid border-border
+border-radius:     rounded-md
+padding:           px-3 py-2
+font-size:         14px
+color:             text-text-primary
+placeholder color: text-text-muted
 focus:             ring-1 ring-accent border-accent
 ```
 
 ---
 
-## Table
+## 表格
 
-- No alternating row colors — [color] rows only, separated by border
-- Row border: `1px solid [border token]` between rows
-- Column headers: uppercase, [e.g. 12px], font-weight [e.g. 500], color `[text-secondary token]`
-- Row text: [e.g. 14px], color `[text-primary token]`
-- Hover state: `background: [surface-secondary token]`
-
----
-
-## Empty States
-
-Every section that can be empty must have an empty state. Keep it minimal:
-
-- Short descriptive text in `[text-muted token]`
-- Optional icon above text
-- CTA button if there's a logical next action
+- 无交替行颜色 — 仅 `bg-surface` 行，用边框分隔
+- 行边框：行间 `border-b border-border`
+- 列标题：大写，12px，字重 500，颜色 `text-text-secondary`
+- 行文本：14px，颜色 `text-text-primary`
+- 悬停状态：`bg-surface-secondary`
 
 ---
 
-## Tailwind v4 Note
+## 空状态
 
-This project uses Tailwind v4. Tokens are defined with `@theme` in globals.css — no `tailwind.config.ts` needed. Never define colors in a config file. Always use `@theme` for new tokens.
+每个可能为空的区域必须有空状态。保持简洁：
+
+- `text-text-muted` 中的简短描述性文本
+- 文本上方的可选图标
+- 如果有逻辑上的下一步操作，提供 CTA 按钮
 
 ---
 
-## Do Nots
+## Tailwind v4 注意事项
 
-- Never use Tailwind's built-in color classes (`bg-purple-500`, `text-gray-600`) — use project tokens only
-- Never define colors in `tailwind.config.ts` — use `@theme` in globals.css
-- Never add gradients to card backgrounds
-- Never use more than one font weight in a single UI element
-- Never show raw error messages to users — always show human readable text
-- [Add any project-specific rules here]
+本项目使用 Tailwind v4。令牌使用 `@theme` 在 globals.css 中定义 — 不需要 `tailwind.config.ts`。永不将颜色定义在配置文件中。新令牌始终使用 `@theme`。
+
+---
+
+## 禁止事项
+
+- 永不使用 Tailwind 内置颜色类（`bg-purple-500`、`text-gray-600`）— 仅使用项目令牌
+- 永不将颜色定义在 `tailwind.config.ts` — 使用 `@theme` 在 globals.css
+- 永不给卡片背景添加渐变
+- 永不在单个 UI 元素中使用超过一种字重
+- 永不向用户显示原始错误消息 — 始终显示人类可读的文本

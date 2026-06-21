@@ -1,133 +1,218 @@
-<!-- System architecture: how the app is structured and how data flows through it -->
+# 系统架构
 
-# Architecture
+## 技术栈
 
-## Stack
-
-| Layer            | Tool                        | Purpose                        |
-| ---------------- | --------------------------- | ------------------------------ |
-| [e.g. Framework] | [e.g. Next.js]              | [e.g. Full stack framework]    |
-| [e.g. Database]  | [e.g. PostgreSQL]           | [e.g. Primary data store]      |
-| [e.g. Auth]      | [e.g. Clerk]                | [e.g. Authentication]          |
-| [e.g. AI]        | [e.g. OpenAI GPT-4o]        | [e.g. Matching and extraction] |
-| [e.g. Styling]   | [e.g. Tailwind + shadcn/ui] | [e.g. UI components]           |
-| [e.g. Language]  | [e.g. TypeScript strict]    | [e.g. Throughout]              |
+| 层级           | 工具                              | 用途                     |
+| -------------- | --------------------------------- | ------------------------ |
+| 框架           | Next.js 15                        | 全栈框架（App Router）   |
+| 数据库         | InsForge（PostgreSQL）            | 主要数据存储             |
+| 认证           | InsForge Auth                     | 用户认证和授权           |
+| 存储           | InsForge Storage                  | 文件存储（简历 PDF）     |
+| AI             | OpenAI GPT-4o                     | 匹配评分、简历定制       |
+| 样式           | Tailwind CSS v4 + shadcn/ui       | UI 组件和样式            |
+| 浏览器自动化   | Browserbase + Stagehand           | LinkedIn 职位抓取        |
+| 代理编排       | AgentSpan                         | 持久化代理任务           |
+| 语言           | TypeScript（严格模式）            | 全项目使用               |
 
 ---
 
-## Folder Structure
+## 文件夹结构
 
 ```
 /
-├── context/                    # context files live here
-├── [e.g. app/]
-│   ├── [route]/                # [describe]
-│   └── api/                    # [describe]
-├── [e.g. components/]
-│   ├── ui/                     # [describe]
-│   └── [feature]/              # [describe]
-├── [e.g. lib/]                 # [describe]
-└── [e.g. types/]               # [describe]
+├── context-driven-dev-main/     # 上下文规范文件
+│   └── context/                 # 项目上下文文档
+├── app/                         # Next.js App Router
+│   ├── (auth)/                  # 认证相关页面
+│   │   ├── login/               # 登录页
+│   │   └── signup/              # 注册页
+│   ├── (main)/                  # 主应用页面
+│   │   ├── jobs/                # 职位页面
+│   │   ├── resumes/             # 简历页面
+│   │   ├── applications/        # 申请记录页面
+│   │   └── profile/             # 个人资料页面
+│   └── api/                     # API 路由
+├── components/                  # React 组件
+│   ├── ui/                      # shadcn/ui 基础组件
+│   └── features/                # 业务功能组件
+├── lib/                         # 工具库
+│   ├── insforge-server.ts       # InsForge 服务端操作
+│   ├── insforge-client.ts       # InsForge 客户端实例
+│   ├── utils.ts                 # 通用工具函数
+│   └── constants.ts             # 常量定义
+├── agent/                       # 代理相关代码
+│   ├── linkedin/                # LinkedIn 搜索代理
+│   └── resume/                  # 简历生成代理
+├── actions/                     # Server Actions
+├── types/                       # TypeScript 类型定义
+└── hooks/                       # React Hooks
 ```
 
 ---
 
-## System Boundaries
+## 系统边界
 
-| Folder               | Owns                                                                |
-| -------------------- | ------------------------------------------------------------------- |
-| `[e.g. app/]`        | [e.g. Pages and API routes only. No business logic.]                |
-| `[e.g. components/]` | [e.g. UI only. No data fetching. No direct DB calls.]               |
-| `[e.g. lib/]`        | [e.g. Third party client initialisation and shared utilities only.] |
-| `[e.g. types/]`      | [e.g. TypeScript types shared across the project.]                  |
+| 目录                | 职责                                                                 |
+| ------------------- | -------------------------------------------------------------------- |
+| `app/`              | 页面和 API 路由。不含业务逻辑。                                       |
+| `components/`       | 纯 UI 组件。不获取数据。不直接调用数据库。                             |
+| `lib/`              | 第三方客户端初始化和共享工具函数。                                     |
+| `agent/`            | 代理逻辑。不导入 components 或 actions。                               |
+| `actions/`          | Server Actions。不调用 agent 函数。                                   |
+| `types/`            | 跨项目共享的 TypeScript 类型。                                        |
 
 ---
 
-## Data Flows
+## 数据流
 
-### [Flow 1 — e.g. UI Mutation]
+### 1. 职位搜索流程
 
 ```
-[e.g. User interaction in component]
+用户点击搜索
         ↓
-[e.g. Server Action]
+Server Action（触发搜索）
         ↓
-[e.g. DB write]
+API Route（/api/jobs/search）
         ↓
-[e.g. Revalidate or redirect]
+Agent（LinkedIn 代理）
+        ↓
+Browserbase 会话（LinkedIn 认证）
+        ↓
+Stagehand（职位抓取）
+        ↓
+AI 评分（GPT-4o）
+        ↓
+InsForge 数据库（保存职位）
+        ↓
+UI 更新（职位列表）
 ```
 
-### [Flow 2 — e.g. Agent Operation]
+### 2. 简历生成流程
 
 ```
-[e.g. User clicks trigger]
+用户选择职位 + 点击生成简历
         ↓
-[e.g. API route]
+Server Action
         ↓
-[e.g. Agent function]
+API Route（/api/resumes/generate）
         ↓
-[e.g. External API call]
+Agent（简历代理）
         ↓
-[e.g. Results saved to DB]
+获取职位详情 + 用户资料
+        ↓
+GPT-4o（定制简历内容）
+        ↓
+InsForge 存储（保存 PDF）
+        ↓
+InsForge 数据库（保存记录）
+        ↓
+UI 更新（简历列表）
 ```
 
----
+### 3. 职位申请流程
 
-## Database Schema
-
-### `[table_name]`
-
-| Column     | Type        | Notes                   |
-| ---------- | ----------- | ----------------------- |
-| id         | uuid        | Primary key             |
-| user_id    | uuid        | References [auth table] |
-| [column]   | [type]      | [notes]                 |
-| created_at | timestamptz |                         |
-| updated_at | timestamptz |                         |
-
-### `[table_name]`
-
-| Column   | Type   | Notes       |
-| -------- | ------ | ----------- |
-| id       | uuid   | Primary key |
-| [column] | [type] | [notes]     |
-
----
-
-## Storage
-
-| Bucket        | Path                            | Contents      |
-| ------------- | ------------------------------- | ------------- |
-| [bucket_name] | [e.g. files/{user_id}/file.pdf] | [description] |
-
----
-
-## Authentication
-
-- Provider: [e.g. Clerk / NextAuth / custom]
-- Methods: [e.g. Google OAuth, GitHub OAuth, email+password]
-- Protected routes: [list them]
-- Public routes: [list them]
-- [Any redirect behavior after login/logout]
-
----
-
-## [Key Integration] Pattern
-
-[Add one section per major external integration — DB client, AI client, third-party APIs, etc.]
-
-```typescript
-// [Description of when/how this pattern is used]
-[code snippet]
+```
+用户点击申请
+        ↓
+外部申请链接跳转（浏览器）
+        ↓
+或：AgentSpan（触发自动申请任务）
+        ↓
+Agent（申请代理）
+        ↓
+Stagehand（表单填写）
+        ↓
+InsForge 数据库（更新申请状态）
+        ↓
+UI 更新（申请记录）
 ```
 
 ---
 
-## Invariants
+## 数据库表结构
 
-Rules the AI agent must never violate:
+### `profiles` — 用户资料
 
-- [e.g. API routes contain no UI logic. Components contain no DB logic.]
-- [e.g. All DB queries must be scoped to the current user_id — never query without a user filter.]
-- [e.g. No hardcoded hex values or raw color classes in components — use CSS variables from ui-tokens.md.]
-- [Add more as needed]
+| 列名           | 类型         | 说明                     |
+| -------------- | ------------ | ------------------------ |
+| id             | uuid         | 主键，关联 auth.users    |
+| user_id        | uuid         | 外键，auth.users(id)     |
+| full_name      | text         | 姓名                     |
+| email          | text         | 邮箱                     |
+| experience     | jsonb        | 工作经验数组             |
+| skills         | text[]       | 技能列表                 |
+| target_role    | text         | 目标职位                 |
+| salary_min     | integer      | 最低期望薪资             |
+| salary_max     | integer      | 最高期望薪资             |
+| location       | text         | 所在地                   |
+| linkedin_url   | text         | LinkedIn 个人主页        |
+| created_at     | timestamptz  | 创建时间                 |
+| updated_at     | timestamptz  | 更新时间                 |
+
+### `jobs` — 职位
+
+| 列名           | 类型         | 说明                     |
+| -------------- | ------------ | ------------------------ |
+| id             | uuid         | 主键                     |
+| user_id        | uuid         | 外键，auth.users(id)     |
+| title          | text         | 职位名称                 |
+| company        | text         | 公司名称                 |
+| location       | text         | 工作地点                 |
+| description    | text         | 职位描述                 |
+| source_url     | text         | 来源链接（LinkedIn）     |
+| apply_url      | text         | 申请链接                 |
+| apply_type     | text         | 申请类型（external/easy） |
+| match_score    | integer      | 匹配分数（0-100）        |
+| match_breakdown| jsonb        | 匹配详情                 |
+| status         | text         | 状态（saved/applied/...）|
+| discovered_at  | timestamptz  | 发现时间                 |
+| created_at     | timestamptz  | 创建时间                 |
+
+### `resumes` — 简历
+
+| 列名           | 类型         | 说明                     |
+| -------------- | ------------ | ------------------------ |
+| id             | uuid         | 主键                     |
+| user_id        | uuid         | 外键，auth.users(id)     |
+| job_id         | uuid         | 关联职位（可选）         |
+| type           | text         | 类型（base/tailored）    |
+| title          | text         | 简历标题                 |
+| content        | jsonb        | 简历内容                 |
+| file_url       | text         | PDF 文件 URL             |
+| file_key       | text         | 存储 key                 |
+| created_at     | timestamptz  | 创建时间                 |
+
+### `applications` — 申请记录
+
+| 列名           | 类型         | 说明                     |
+| -------------- | ------------ | ------------------------ |
+| id             | uuid         | 主键                     |
+| user_id        | uuid         | 外键，auth.users(id)     |
+| job_id         | uuid         | 外键，jobs(id)           |
+| resume_id      | uuid         | 外键，resumes(id)        |
+| method         | text         | 申请方式（external/agent）|
+| status         | text         | 状态（pending/submitted/failed） |
+| recording_url  | text         | Browserbase 录制 URL     |
+| applied_at     | timestamptz  | 申请时间                 |
+| created_at     | timestamptz  | 创建时间                 |
+
+---
+
+## 存储桶
+
+| 桶名          | 路径                   | 内容           |
+| ------------- | ---------------------- | -------------- |
+| resumes       | `{user_id}/{resume_id}` | 简历 PDF 文件   |
+
+---
+
+## 关键约束
+
+- API 路由不包含 UI 逻辑
+- 组件不包含数据库逻辑
+- Agent 代码（`agent/`）不从 `components/` 或 `actions/` 导入
+- Server Actions 不调用 agent 函数 — 仅 API 路由调用
+- 所有 InsForge 数据库写入通过 `lib/insforge-server.ts`
+- 匹配阈值来自 `lib/utils.ts` 中的 `MATCH_THRESHOLD`
+- AgentSpan 步骤 ID 格式：`apply-{job_id}`
+- 使用外部申请链接 — 不使用 Easy Apply

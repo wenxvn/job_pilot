@@ -1,21 +1,21 @@
-# UI Registry
+# UI 注册表
 
-Living document. Updated after every component is built. Read this before building any new component — match existing patterns exactly before inventing new ones.
-
----
-
-## How to Use
-
-Before building any component:
-
-1. Check if a similar component already exists here
-2. If yes — match its exact classes
-3. If no — build it following ui-rules.md and ui-tokens.md, then add it here
-
-After building any component — update this file with the component name, file path, and exact classes used.
+动态文档。每次构建组件后更新。在构建任何新组件之前阅读此文件 — 在发明新模式之前完全匹配现有模式。
 
 ---
 
-## Components
+## 如何使用
 
-_Empty. Components will be added here as they are built._
+构建任何组件之前：
+
+1. 检查是否已有类似组件
+2. 如果有 — 匹配其精确的类名
+3. 如果没有 — 按照 ui-rules.md 和 ui-tokens.md 构建，然后添加到此文件
+
+构建任何组件后 — 用组件名、文件路径和使用的精确类名更新此文件。
+
+---
+
+## 组件
+
+_空。组件将在构建时添加到此处。_
