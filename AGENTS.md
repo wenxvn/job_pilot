@@ -4,6 +4,10 @@ globs: *
 alwaysApply: true
 ---
 
+## 语言约定
+
+**本项目使用中文。** 所有面向用户的文案、注释、commit message、文档均使用中文。代码变量名、函数名、文件名使用英文。
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # 这不是你熟悉的 Next.js
