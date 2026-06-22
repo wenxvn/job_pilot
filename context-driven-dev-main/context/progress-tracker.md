@@ -28,6 +28,7 @@
 - [x] resumes 存储桶创建（private + RLS 策略）
 - [x] 个人资料 Server Actions（getProfile / upsertProfile / uploadResume）
 - [x] 个人资料页面接入真实数据（加载 / 保存 / 简历上传）
+- [x] 个人资料页面视觉增强（完成度环 + 模块进度条 + 卡片 hover 动画 + stagger 入场）
 - [x] 职位列表页面 UI（/jobs）— 统计卡片、筛选排序、表格列表、匹配徽章
 - [x] 职位详情页面 UI（/jobs/[id]）— 职位信息、匹配详情、申请链接、简历操作
 
@@ -88,4 +89,5 @@
 - 更新 ui-registry.md 和 progress-tracker.md
 - 修正 library-docs.md 中 InsForge SDK API（client.database.from()）
 - 创建职位列表页面 UI（/jobs）— 统计卡片、筛选排序、表格列表、匹配徽章
-- 创建职位详情页面 UI（/jobs/[id]）— 职位信息、匹配详情进度条、申请链接、简历操作
+- 创建职位详情页面 UI（/jobs/[id]）— 职位信息、匹配详情、申请链接、简历操作
+- 个人资料页面视觉增强：SVG 扇形完成度环 + SectionProgress 模块进度检查项 + 卡片 hover 渐变顶条 + stagger 入场动画 + globals.css 新增 profile-ring-in 动画

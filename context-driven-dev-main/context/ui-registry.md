@@ -134,27 +134,47 @@
   - 求职小贴士标题：`flex items-center gap-1.5` + `text-xs font-semibold text-text-primary`
   - 小贴士项：`flex items-start gap-2.5` + `mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent` + `text-xs leading-relaxed text-text-secondary`
 
-### Profile Form（个人资料表单）
+### Profile Page（个人资料页面）
 - **文件：** `app/(main)/profile/page.tsx`
 - **类型：** Client Component
 - **类名：**
-  - 区域卡片：`bg-surface border border-border rounded-xl p-6 shadow-sm`
-  - 区域标题：`text-base font-semibold text-text-primary mb-4 flex items-center gap-2`
-  - 区域图标：`h-4 w-4 text-accent`
+  - 欢迎区容器：`animate-fade-in-up relative overflow-hidden rounded-xl border border-border bg-surface p-6 shadow-sm`
+  - 装饰光晕：`pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-accent/[0.08] blur-3xl` + `bg-info/[0.06] blur-2xl`
+  - AI 徽章：`animate-fade-in-up stagger-1 mb-3 inline-flex items-center gap-2 rounded-full bg-accent-light px-3 py-1`
+  - 欢迎标题：`animate-fade-in-up stagger-2 text-2xl font-bold text-text-primary sm:text-3xl`
+  - 欢迎副标题：`animate-fade-in-up stagger-3 mt-2 max-w-md text-sm leading-relaxed text-text-secondary`
+  - 完成度环容器：`animate-fade-in-up stagger-3 hidden sm:block shrink-0`
+  - 完成度环 SVG：`svg width=140 height=140 -rotate-90` + `animate-profile-ring-in`（CSS 自定义属性 `--ring-circ` / `--ring-target`）
+  - 完成度百分比：`text-3xl font-bold text-text-primary`
+  - 完成度标签：`text-xs text-text-muted mt-0.5`
+  - 区域卡片：`group relative overflow-hidden rounded-xl border border-border bg-surface p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md animate-fade-in-up stagger-N`
+  - 区域渐变顶条：`absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-accent via-info to-accent opacity-0 transition-opacity group-hover:opacity-100`
+  - 区域图标容器：`flex h-8 w-8 items-center justify-center rounded-lg bg-accent-light transition-transform group-hover:scale-105`
+  - 区域标题：`text-base font-semibold text-text-primary flex items-center gap-2`
+  - 模块完成项：`flex items-center gap-2 animate-fade-in-up`（逐项延迟 60ms + 400ms 基础偏移）
+  - 完成图标：`h-4 w-4 text-success shrink-0`（CheckCircle2）/ `h-4 w-4 text-text-muted shrink-0`（Circle）
+  - 完成项文本：`text-xs text-text-primary font-medium`（已完成）/ `text-xs text-text-muted`（未完成）
+  - 模块进度条：`flex-1 h-1.5 overflow-hidden rounded-full bg-surface-secondary` + `animate-[progress-in_1s_ease-out_forwards] opacity-0`
+  - 进度计数：`text-[11px] text-text-muted font-medium`
   - 表单网格：`grid grid-cols-1 md:grid-cols-2 gap-4`
   - Label：`block text-sm font-medium text-text-secondary mb-1.5`
-  - 输入框：`w-full bg-surface border border-border rounded-md px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent`
+  - 输入框：`w-full bg-surface border border-border rounded-md px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent transition-shadow`
   - 禁用输入框：`w-full bg-surface-secondary border border-border rounded-md px-3 py-2 text-sm text-text-muted cursor-not-allowed`
-  - 技能标签：`inline-flex items-center gap-1.5 bg-accent-light text-accent rounded-full px-3 py-1 text-xs font-medium`
-  - 删除标签按钮：`hover:text-accent-dark`
-  - 添加按钮：`bg-surface border border-border text-text-primary rounded-md px-3 py-2 text-sm font-medium hover:bg-surface-secondary`
-  - 文字链接按钮：`flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-dark`
-  - 经验条目：`border border-border rounded-lg p-4 relative`
-  - 文本域：`w-full bg-surface border border-border rounded-md px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent resize-none`
-  - 上传区域：`border-2 border-dashed border-border rounded-lg p-8 text-center`
+  - 技能标签：`inline-flex items-center gap-1.5 bg-accent-light text-accent rounded-full px-3 py-1 text-xs font-medium animate-fade-in-up`（逐项延迟 50ms）
+  - 删除标签按钮：`hover:text-accent-dark transition-colors`
+  - 添加按钮：`bg-surface border border-border text-text-primary rounded-md px-3 py-2 text-sm font-medium hover:bg-surface-secondary transition-colors`
+  - 文字链接按钮：`flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-dark transition-colors`
+  - 空状态图标：`h-10 w-10 text-text-muted/40 mx-auto mb-3`
+  - 经验条目：`border border-border rounded-lg p-4 relative animate-fade-in-up`（逐项延迟 80ms）
+  - 文本域：`w-full bg-surface border border-border rounded-md px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent resize-none transition-shadow`
+  - 已上传简历：`flex items-center gap-3 border border-border rounded-lg p-4 transition-colors hover:border-accent/30`
+  - 简历图标容器：`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent-light`
+  - 上传区域：`border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-accent/40 hover:bg-accent/[0.02] transition-all`
   - 上传图标：`h-8 w-8 text-text-muted mx-auto mb-3`
-  - 保存成功标签：`text-sm text-success-foreground bg-success-light rounded-full px-3 py-1`
-  - 保存按钮：`bg-accent text-accent-foreground rounded-md px-6 py-2.5 text-sm font-medium disabled:opacity-50`
+  - 上传中 spinner：`h-8 w-8 rounded-full border-2 border-accent border-t-transparent animate-spin`
+  - 底部保存栏：`animate-fade-in-up stagger-6 flex items-center justify-between rounded-xl border border-border bg-surface p-5 shadow-sm`
+  - 保存成功标签：`text-sm text-success-foreground bg-success-light rounded-full px-3 py-1 animate-fade-in`
+  - 保存按钮：`bg-accent text-accent-foreground rounded-md px-6 py-2.5 text-sm font-medium disabled:opacity-50 transition-all hover:brightness-110 hover:shadow-md hover:shadow-accent/20`
 
 ### Jobs Page（职位列表页面）
 - **文件：** `app/(main)/jobs/page.tsx`
