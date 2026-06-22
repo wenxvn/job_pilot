@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { signIn } from "@/lib/insforge/auth-actions";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -28,6 +29,9 @@ export default function LoginPage() {
         setError(result.error.message ?? "登录失败，请检查你的邮箱和密码。");
       }
     } else {
+      const email = String(formData.get("email"));
+      posthog.identify(email, { email });
+      posthog.capture("user_logged_in", { method: "password" });
       await refreshAuth();
       router.push("/");
     }

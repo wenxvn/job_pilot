@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogOut, User } from "lucide-react";
+import posthog from "posthog-js";
 import { useAuth } from "@/hooks/useAuth";
 import { signOut } from "@/lib/insforge/auth-actions";
 
@@ -59,6 +60,7 @@ export function Navbar() {
             <form action={signOut}>
               <button
                 type="submit"
+                onClick={() => posthog.reset()}
                 className="p-2 text-text-muted hover:text-text-secondary"
                 title="退出登录"
               >

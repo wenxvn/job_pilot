@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { signUp } from "@/lib/insforge/auth-actions";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -27,6 +28,10 @@ export default function SignupPage() {
     } else if (result.requireEmailVerification) {
       setNeedsVerification(true);
     } else {
+      const email = String(formData.get("email"));
+      const name = String(formData.get("name"));
+      posthog.identify(email, { email, name });
+      posthog.capture("user_signed_up", { method: "password" });
       await refreshAuth();
       router.push("/");
     }
