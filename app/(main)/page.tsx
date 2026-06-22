@@ -252,6 +252,7 @@ function Dashboard({ userName }: { userName: string }) {
       href: "/jobs",
       color: "bg-accent-light",
       iconColor: "text-accent",
+      gradient: "from-accent via-info to-accent",
       card: "jobs",
     },
     {
@@ -261,6 +262,7 @@ function Dashboard({ userName }: { userName: string }) {
       href: "/resumes",
       color: "bg-info-light",
       iconColor: "text-info-foreground",
+      gradient: "from-info via-accent to-info",
       card: "resumes",
     },
     {
@@ -270,7 +272,18 @@ function Dashboard({ userName }: { userName: string }) {
       href: "/applications",
       color: "bg-success-light",
       iconColor: "text-success-foreground",
+      gradient: "from-success via-info to-success",
       card: "applications",
+    },
+    {
+      icon: Sparkles,
+      title: "AI 匹配",
+      desc: "智能分析职位匹配度",
+      href: "/jobs",
+      color: "bg-accent-light",
+      iconColor: "text-accent",
+      gradient: "from-accent via-success to-accent",
+      card: "ai_match",
     },
   ];
 
@@ -296,6 +309,26 @@ function Dashboard({ userName }: { userName: string }) {
       color: "bg-info-light",
       iconColor: "text-info-foreground",
     },
+    {
+      icon: Target,
+      text: "更新了个人技能标签",
+      time: "3 天前",
+      color: "bg-accent-light",
+      iconColor: "text-accent",
+    },
+    {
+      icon: FileText,
+      text: "定制了前端工程师简历",
+      time: "4 天前",
+      color: "bg-info-light",
+      iconColor: "text-info-foreground",
+    },
+  ];
+
+  const weeklyGoals = [
+    { label: "投递简历", current: 5, target: 10, color: "bg-accent" },
+    { label: "发现新职位", current: 12, target: 20, color: "bg-info" },
+    { label: "定制简历", current: 3, target: 5, color: "bg-success" },
   ];
 
   const mockTips = [
@@ -304,18 +337,96 @@ function Dashboard({ userName }: { userName: string }) {
     "定期更新技能列表，获取更精准的推荐",
   ];
 
+  // 获取当前时间段的问候语
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 6
+      ? "夜深了"
+      : hour < 12
+        ? "早上好"
+        : hour < 18
+          ? "下午好"
+          : "晚上好";
+
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6">
+      {/* 装饰性背景光晕 */}
+      <div className="pointer-events-none absolute -top-20 -right-20 h-[400px] w-[400px] rounded-full bg-accent/[0.05] blur-3xl" />
+      <div className="pointer-events-none absolute top-1/2 -left-32 h-[300px] w-[300px] rounded-full bg-info/[0.04] blur-3xl" />
+
       {/* 欢迎区 */}
       <div className="animate-fade-in-up relative overflow-hidden rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-accent/[0.06] blur-2xl" />
-        <div className="relative">
-          <h1 className="text-2xl font-bold text-text-primary">
-            欢迎回来，{userName}
-          </h1>
-          <p className="mt-1 text-sm text-text-secondary">
-            以下是你的求职进展概览，祝你今天投递顺利！
-          </p>
+        {/* 多层装饰光晕 */}
+        <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-accent/[0.08] blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-info/[0.06] blur-2xl" />
+        <div className="pointer-events-none absolute bottom-0 right-1/3 h-24 w-24 rounded-full bg-success/[0.05] blur-2xl" />
+
+        <div className="relative flex items-start justify-between gap-6">
+          <div className="min-w-0 flex-1">
+            <div className="animate-fade-in-up stagger-1 mb-3 inline-flex items-center gap-2 rounded-full bg-accent-light px-3 py-1">
+              <Zap className="h-3 w-3 text-accent" />
+              <span className="text-xs font-medium text-accent">
+                AI 求职助手已就绪
+              </span>
+            </div>
+            <h1 className="animate-fade-in-up stagger-2 text-2xl font-bold text-text-primary sm:text-3xl">
+              {greeting}，{userName}
+            </h1>
+            <p className="animate-fade-in-up stagger-3 mt-2 max-w-md text-sm leading-relaxed text-text-secondary">
+              你的求职旅程正在顺利推进，继续保持节奏！今天的目标是再投递 2 个职位。
+            </p>
+            <div className="animate-fade-in-up stagger-4 mt-4 flex flex-wrap gap-3">
+              <Link
+                href="/jobs"
+                onClick={() =>
+                  posthog.capture("feature_card_click", { card: "jobs" })
+                }
+                className="group inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground shadow-md shadow-accent/20 transition-all hover:shadow-lg hover:shadow-accent/25 hover:brightness-110"
+              >
+                发现职位
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+              <Link
+                href="/profile"
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-5 py-2.5 text-sm font-medium text-text-primary shadow-sm transition-all hover:bg-surface-secondary hover:shadow-md"
+              >
+                完善资料
+              </Link>
+            </div>
+          </div>
+
+          {/* 每日进度环 */}
+          <div className="animate-fade-in-up stagger-3 hidden shrink-0 sm:flex flex-col items-center">
+            <div className="relative h-24 w-24">
+              <svg className="h-24 w-24 -rotate-90" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="var(--color-surface-secondary)"
+                  strokeWidth="8"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="var(--color-accent)"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 42 * 0.65} ${2 * Math.PI * 42}`}
+                  className="animate-[dash-in_1.5s_ease-out_forwards]"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-lg font-bold text-text-primary">
+                  65%
+                </span>
+                <span className="text-[10px] text-text-muted">今日目标</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -329,6 +440,8 @@ function Dashboard({ userName }: { userName: string }) {
             icon: Briefcase,
             iconBg: "bg-accent-light",
             iconColor: "text-accent",
+            progress: 72,
+            progressColor: "bg-accent",
           },
           {
             label: "平均匹配度",
@@ -337,6 +450,8 @@ function Dashboard({ userName }: { userName: string }) {
             icon: TrendingUp,
             iconBg: "bg-success-light",
             iconColor: "text-success-foreground",
+            progress: 76,
+            progressColor: "bg-success",
           },
           {
             label: "已投递",
@@ -345,26 +460,44 @@ function Dashboard({ userName }: { userName: string }) {
             icon: Send,
             iconBg: "bg-info-light",
             iconColor: "text-info-foreground",
+            progress: 45,
+            progressColor: "bg-info",
           },
         ].map((stat, i) => (
           <div
             key={stat.label}
-            className={`group flex items-center gap-4 rounded-xl border border-border bg-surface p-5 shadow-sm transition-all hover:shadow-md animate-fade-in-up stagger-${i + 1}`}
+            className={`group relative overflow-hidden rounded-xl border border-border bg-surface p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md animate-fade-in-up stagger-${i + 1}`}
           >
-            <div
-              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${stat.iconBg}`}
-            >
-              <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
+            {/* 悬停渐变顶条 */}
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-accent via-info to-accent opacity-0 transition-opacity group-hover:opacity-100" />
+            <div className="flex items-center gap-4">
+              <div
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${stat.iconBg} transition-transform group-hover:scale-105`}
+              >
+                <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-medium text-text-secondary">
+                  {stat.label}
+                </div>
+                <div className="mt-0.5 text-2xl font-bold text-text-primary">
+                  {stat.value}
+                </div>
+              </div>
             </div>
-            <div className="min-w-0">
-              <div className="text-xs font-medium text-text-secondary">
-                {stat.label}
+            {/* 进度条 */}
+            <div className="mt-4">
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-[11px] text-text-muted">本周进度</span>
+                <span className="text-[11px] font-medium text-text-muted">
+                  {stat.change}
+                </span>
               </div>
-              <div className="mt-0.5 text-xl font-bold text-text-primary">
-                {stat.value}
-              </div>
-              <div className="mt-0.5 text-xs text-text-muted">
-                {stat.change}
+              <div className="h-1.5 overflow-hidden rounded-full bg-surface-secondary">
+                <div
+                  className={`h-full rounded-full ${stat.progressColor} animate-[progress-in_1.2s_ease-out_forwards]`}
+                  style={{ width: `${stat.progress}%` }}
+                />
               </div>
             </div>
           </div>
@@ -372,13 +505,13 @@ function Dashboard({ userName }: { userName: string }) {
       </div>
 
       {/* 快捷操作 + 最近动态 */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         {/* 快捷操作 */}
-        <div className="lg:col-span-3">
-          <h2 className="mb-3 text-base font-semibold text-text-primary">
+        <div className="lg:col-span-3 animate-fade-in-up stagger-4">
+          <h2 className="mb-4 text-base font-semibold text-text-primary">
             快捷操作
           </h2>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {quickActions.map((action, i) => (
               <Link
                 key={action.title}
@@ -386,50 +519,105 @@ function Dashboard({ userName }: { userName: string }) {
                 onClick={() =>
                   posthog.capture("feature_card_click", { card: action.card })
                 }
-                className={`group flex items-center gap-4 rounded-xl border border-border bg-surface p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md animate-fade-in-up stagger-${i + 1}`}
+                className={`group relative overflow-hidden rounded-xl border border-border bg-surface p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg animate-fade-in-up stagger-${i + 5}`}
               >
+                {/* 悬停渐变边框 */}
                 <div
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${action.color}`}
-                >
-                  <action.icon className={`h-5 w-5 ${action.iconColor}`} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-semibold text-text-primary">
-                    {action.title}
+                  className={`absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r ${action.gradient} opacity-0 transition-opacity group-hover:opacity-100`}
+                />
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${action.color} transition-all duration-300 group-hover:scale-105 group-hover:shadow-sm`}
+                  >
+                    <action.icon className={`h-5 w-5 ${action.iconColor}`} />
                   </div>
-                  <div className="mt-0.5 text-xs text-text-secondary">
-                    {action.desc}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold text-text-primary">
+                      {action.title}
+                    </div>
+                    <div className="mt-1 text-xs leading-relaxed text-text-secondary">
+                      {action.desc}
+                    </div>
                   </div>
+                  <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-text-muted transition-all group-hover:translate-x-0.5 group-hover:text-accent" />
                 </div>
-                <ChevronRight className="h-4 w-4 text-text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
               </Link>
             ))}
+          </div>
+
+          {/* 本周目标 */}
+          <div className="mt-6 animate-fade-in-up stagger-6">
+            <h2 className="mb-4 text-base font-semibold text-text-primary">
+              本周目标
+            </h2>
+            <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+              <div className="space-y-4">
+                {weeklyGoals.map((goal, i) => {
+                  const pct = Math.round(
+                    (goal.current / goal.target) * 100
+                  );
+                  return (
+                    <div key={goal.label}>
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-sm font-medium text-text-primary">
+                          {goal.label}
+                        </span>
+                        <span className="text-xs text-text-muted">
+                          {goal.current}/{goal.target}
+                        </span>
+                      </div>
+                      <div className="h-2 overflow-hidden rounded-full bg-surface-secondary">
+                        <div
+                          className={`h-full rounded-full ${goal.color} animate-[progress-in_1s_ease-out_${i * 200}ms_forwards] opacity-0`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-4 flex items-center gap-1.5 rounded-lg bg-accent-light/50 px-3 py-2">
+                <Target className="h-3.5 w-3.5 text-accent" />
+                <span className="text-xs text-accent">
+                  再投递 5 份简历即可完成本周目标
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* 最近动态 */}
-        <div className="lg:col-span-2">
-          <h2 className="mb-3 text-base font-semibold text-text-primary">
+        <div className="lg:col-span-2 animate-fade-in-up stagger-5">
+          <h2 className="mb-4 text-base font-semibold text-text-primary">
             最近动态
           </h2>
           <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
-            <div className="space-y-4">
-              {mockActivity.map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
+            <div className="relative">
+              {/* 时间线连接线 */}
+              <div className="absolute left-[15px] top-8 bottom-8 w-px bg-gradient-to-b from-accent/30 via-info/20 to-transparent" />
+
+              <div className="space-y-4">
+                {mockActivity.map((item, i) => (
                   <div
-                    className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${item.color}`}
+                    key={i}
+                    className={`relative flex items-start gap-3 animate-fade-in-up`}
+                    style={{ animationDelay: `${(i + 6) * 80}ms` }}
                   >
-                    <item.icon className={`h-4 w-4 ${item.iconColor}`} />
+                    <div
+                      className={`relative z-10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${item.color} shadow-sm`}
+                    >
+                      <item.icon className={`h-4 w-4 ${item.iconColor}`} />
+                    </div>
+                    <div className="min-w-0 flex-1 pt-0.5">
+                      <p className="text-sm text-text-primary">{item.text}</p>
+                      <p className="mt-1 flex items-center gap-1 text-xs text-text-muted">
+                        <Clock className="h-3 w-3" />
+                        {item.time}
+                      </p>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm text-text-primary">{item.text}</p>
-                    <p className="mt-0.5 flex items-center gap-1 text-xs text-text-muted">
-                      <Clock className="h-3 w-3" />
-                      {item.time}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             {/* 分割线 */}
@@ -443,10 +631,10 @@ function Dashboard({ userName }: { userName: string }) {
                   求职小贴士
                 </span>
               </div>
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 {mockTips.map((tip, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent" />
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
                     <span className="text-xs leading-relaxed text-text-secondary">
                       {tip}
                     </span>

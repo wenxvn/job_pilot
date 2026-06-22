@@ -21,6 +21,7 @@
 - [x] 导航栏组件（认证状态感知）
 - [x] 首页仪表盘（登录/未登录两种状态）
 - [x] 首页视觉升级（Landing Page 完整重构 + Dashboard 丰富化 + CSS 动画系统）
+- [x] Dashboard 视觉增强（多层光晕欢迎区 + 每日进度环 + 统计进度条 + 2x2 快捷操作 + 本周目标 + 动态时间线）
 - [x] PostHog 分析集成（Provider + usePostHog hook + 事件追踪）
 - [x] 个人资料页面 UI（/profile）
 - [x] profiles 表创建（数据库迁移 + RLS 策略）

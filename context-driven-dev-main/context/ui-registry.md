@@ -91,28 +91,48 @@
 - **文件：** `app/(main)/page.tsx`
 - **类型：** Client Component（Dashboard）
 - **类名：**
+  - 容器：`relative space-y-6`
+  - 装饰性背景光晕：`pointer-events-none absolute -top-20 -right-20 h-[400px] w-[400px] rounded-full bg-accent/[0.05] blur-3xl`
   - 欢迎区：`animate-fade-in-up relative overflow-hidden rounded-xl border border-border bg-surface p-6 shadow-sm`
-  - 欢迎光晕：`pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-accent/[0.06] blur-2xl`
-  - 欢迎标题：`text-2xl font-bold text-text-primary`
-  - 欢迎副标题：`mt-1 text-sm text-text-secondary`
+  - 欢迎光晕（多层）：`pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-accent/[0.08] blur-3xl` + `bg-info/[0.06] blur-2xl` + `bg-success/[0.05] blur-2xl`
+  - AI 徽章：`animate-fade-in-up stagger-1 mb-3 inline-flex items-center gap-2 rounded-full bg-accent-light px-3 py-1`
+  - 欢迎标题：`animate-fade-in-up stagger-2 text-2xl font-bold text-text-primary sm:text-3xl`
+  - 欢迎副标题：`animate-fade-in-up stagger-3 mt-2 max-w-md text-sm leading-relaxed text-text-secondary`
+  - 欢迎 CTA：`animate-fade-in-up stagger-4 mt-4 flex flex-wrap gap-3`
+  - 主 CTA 按钮：`group inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground shadow-md shadow-accent/20 transition-all hover:shadow-lg hover:shadow-accent/25 hover:brightness-110`
+  - 次 CTA 按钮：`inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-5 py-2.5 text-sm font-medium text-text-primary shadow-sm transition-all hover:bg-surface-secondary hover:shadow-md`
+  - 每日进度环：`animate-fade-in-up stagger-3 hidden shrink-0 sm:flex flex-col items-center` + SVG 圆环 + `animate-[dash-in_1.5s_ease-out_forwards]`
   - 统计卡片网格：`grid grid-cols-1 gap-4 sm:grid-cols-3`
-  - 统计卡片：`group flex items-center gap-4 rounded-xl border border-border bg-surface p-5 shadow-sm transition-all hover:shadow-md animate-fade-in-up stagger-N`
-  - 统计图标容器：`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg`（变体：`bg-accent-light`、`bg-success-light`、`bg-info-light`）
+  - 统计卡片：`group relative overflow-hidden rounded-xl border border-border bg-surface p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md animate-fade-in-up stagger-N`
+  - 统计卡片渐变顶条：`absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-accent via-info to-accent opacity-0 transition-opacity group-hover:opacity-100`
+  - 统计图标容器：`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl`（变体：`bg-accent-light`、`bg-success-light`、`bg-info-light`）+ `transition-transform group-hover:scale-105`
   - 统计标签：`text-xs font-medium text-text-secondary`
-  - 统计数值：`mt-0.5 text-xl font-bold text-text-primary`
-  - 统计变化：`mt-0.5 text-xs text-text-muted`
-  - 快捷操作卡片：`group flex items-center gap-4 rounded-xl border border-border bg-surface p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md animate-fade-in-up stagger-N`
-  - 操作图标容器：`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg`（变体：`bg-accent-light`、`bg-info-light`、`bg-success-light`）
+  - 统计数值：`mt-0.5 text-2xl font-bold text-text-primary`
+  - 进度条容器：`mt-4`
+  - 进度条标签：`text-[11px] text-text-muted` + `text-[11px] font-medium text-text-muted`
+  - 进度条背景：`h-1.5 overflow-hidden rounded-full bg-surface-secondary`
+  - 进度条：`h-full rounded-full animate-[progress-in_1.2s_ease-out_forwards]`（变体：`bg-accent`、`bg-success`、`bg-info`）
+  - 快捷操作网格：`grid grid-cols-1 gap-3 sm:grid-cols-2`
+  - 快捷操作卡片：`group relative overflow-hidden rounded-xl border border-border bg-surface p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg animate-fade-in-up stagger-N`
+  - 快捷操作渐变顶条：`absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r ${action.gradient} opacity-0 transition-opacity group-hover:opacity-100`
+  - 操作图标容器：`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl` + `transition-all duration-300 group-hover:scale-105 group-hover:shadow-sm`
   - 操作标题：`text-sm font-semibold text-text-primary`
-  - 操作描述：`mt-0.5 text-xs text-text-secondary`
-  - 操作箭头：`h-4 w-4 text-text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent`
+  - 操作描述：`mt-1 text-xs leading-relaxed text-text-secondary`
+  - 操作箭头：`mt-0.5 h-4 w-4 shrink-0 text-text-muted transition-all group-hover:translate-x-0.5 group-hover:text-accent`
+  - 本周目标标题：`mb-4 text-base font-semibold text-text-primary`
+  - 本周目标容器：`rounded-xl border border-border bg-surface p-5 shadow-sm`
+  - 目标行标签：`text-sm font-medium text-text-primary` + `text-xs text-text-muted`
+  - 目标进度条背景：`h-2 overflow-hidden rounded-full bg-surface-secondary`
+  - 目标进度条：`h-full rounded-full animate-[progress-in_1s_ease-out_Nms_forwards] opacity-0`（变体：`bg-accent`、`bg-info`、`bg-success`）
+  - 目标提示：`mt-4 flex items-center gap-1.5 rounded-lg bg-accent-light/50 px-3 py-2` + `text-xs text-accent`
   - 最近动态容器：`rounded-xl border border-border bg-surface p-5 shadow-sm`
-  - 动态项：`flex items-start gap-3`
-  - 动态图标容器：`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg`
+  - 时间线连接线：`absolute left-[15px] top-8 bottom-8 w-px bg-gradient-to-b from-accent/30 via-info/20 to-transparent`
+  - 动态项：`relative flex items-start gap-3 animate-fade-in-up`（逐项延迟 style `animationDelay`）
+  - 动态图标容器：`relative z-10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm`
   - 动态文本：`text-sm text-text-primary`
-  - 动态时间：`mt-0.5 flex items-center gap-1 text-xs text-text-muted`
+  - 动态时间：`mt-1 flex items-center gap-1 text-xs text-text-muted`
   - 求职小贴士标题：`flex items-center gap-1.5` + `text-xs font-semibold text-text-primary`
-  - 小贴士项：`flex items-start gap-2` + `mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent` + `text-xs leading-relaxed text-text-secondary`
+  - 小贴士项：`flex items-start gap-2.5` + `mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent` + `text-xs leading-relaxed text-text-secondary`
 
 ### Profile Form（个人资料表单）
 - **文件：** `app/(main)/profile/page.tsx`

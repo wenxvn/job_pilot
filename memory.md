@@ -1,45 +1,49 @@
-# Memory — 首页视觉全面升级
+# Memory — Dashboard 视觉增强
 
 Last updated: 2026-06-22
 
 ## What was built
 
-- **globals.css** — 新增动画系统：`fade-in-up` / `fade-in` / `float` / `float-delayed` / `pulse-ring` / `gradient-shift` / `shimmer`，以及 6 级 stagger 延迟（stagger-1 ~ stagger-6）
-- **app/(main)/page.tsx** — 主页完全重写为两个独立组件：
-  - **LandingPage**（未登录）：背景光晕、浮动装饰图标、AI 徽章、渐变流光标题、双 CTA 按钮带阴影、社会证明数据条（3x/85%/10s）、四大核心能力卡片（悬停渐变顶部条 + 图标反色）、四步使用流程（渐变连接线）、底部二次 CTA
-  - **Dashboard**（已登录）：带光晕欢迎区、三列统计卡片（已发现职位/平均匹配度/已投递）、快捷操作列表（带箭头引导）、最近动态时间线 + 求职小贴士
-- **ui-registry.md** — 同步所有新组件类名（Landing Hero、Landing Features、Landing Steps、Dashboard）
-- **progress-tracker.md** — 记录首页视觉升级完成
+- **app/(main)/page.tsx** — Dashboard 组件完全重写：
+  - **欢迎区**：多层装饰光晕（accent/info/success 三色）、AI 徽章、时间段问候语（早上好/下午好/晚上好）、激励文案、双 CTA 按钮（发现职位 + 完善资料）、SVG 每日进度环（带 dash-in 动画）
+  - **统计卡片**：图标升级 rounded-xl + hover scale-105、数值 text-2xl、新增进度条（progress-in 入场动画）、悬停渐变顶条
+  - **快捷操作**：从单列改为 2x2 网格、新增「AI 匹配」第四张卡片、每张卡片悬停渐变边框 + 图标缩放
+  - **新增「本周目标」区域**：三条进度条（投递简历/发现新职位/定制简历）、逐项延迟入场动画、底部激励提示条
+  - **最近动态**：时间线连接线（渐变色淡出）、逐项延迟入场动画（80ms 间隔）、新增 2 条动态
+- **app/globals.css** — 新增动画关键帧：`dash-in`（SVG 进度环描边）、`progress-in`（进度条从 0% 填充）
+- **context-driven-dev-main/context/ui-registry.md** — Dashboard 注册表完整更新
+- **context-driven-dev-main/context/progress-tracker.md** — 记录 Dashboard 视觉增强完成
 
 ## Decisions made
 
-- Landing Page 和 Dashboard 拆分为独立函数组件，保持 page.tsx 结构清晰
-- 使用 CSS 纯动画（@keyframes）而非 JS 动画库，零额外依赖
-- 渐变文字效果使用 `bg-gradient-to-r from-accent via-info to-accent` + `animate-gradient-shift`
-- 背景光晕使用 `blur-3xl` + 低透明度项目色，不使用硬编码颜色
-- 功能卡片悬停效果：顶部渐变条显现 + 图标容器反色，保持交互层次感
+- Dashboard 使用时间段问候语（基于 new Date().getHours()）
+- 进度环使用 SVG circle + stroke-dasharray + dash-in 动画
+- 进度条使用 width style + progress-in 动画
+- 最近动态逐项延迟使用 style={{ animationDelay }} 而非 stagger 类
+- 快捷操作从单列列表改为 2x2 grid
 
 ## Problems solved
 
-- `user.name ?? user.email` 类型错误（email 可能是 undefined），改为 `user.name ?? user.email ?? "用户"` 兜底
+无新问题
 
 ## Current state
 
-- 首页视觉全面升级完成，TypeScript 零错误
-- 项目已完成第一阶段（基础设施）和第二阶段大部分核心页面 UI
-- 职位列表/详情页面使用模拟数据，尚未接入数据库
-- PostHog 事件追踪已覆盖全部已完成页面的完整用户行为链路
-- 已有事件：认证（logged_in/signed_up）、导航（nav_click）、首页（cta_click/feature_card_click）、个人资料（profile_saved/resume_uploaded）、职位列表（job_click/job_apply_click/jobs_filtered/jobs_sorted）、职位详情（job_viewed/job_apply_click/generate_resume_click）
+- Dashboard 视觉增强已完成，TypeScript 编译零错误
+- 但尚未 git commit 和 push（用户要求提交推送）
+- 职位列表/详情页面仍使用模拟数据，尚未接入数据库
+- 已开始阅读 jobs 表迁移和 Server Actions 的参考模式，准备构建计划第 07 步
 
 ## Next session starts with
 
-- 构建计划第07步：**职位管理 — 逻辑**
-  - 创建 `jobs` 表（数据库迁移 + RLS 策略）
-  - Server Actions（查询、更新、删除职位）
-  - 申请状态更新
-  - 更新职位列表/详情页面接入真实数据
+继续构建计划第 07 步：**职位管理 — 逻辑**（已读完参考模式）
+1. 创建 `jobs` 表迁移（SQL + RLS 策略）+ `types/job.ts` 类型定义
+2. 创建 `actions/job.ts` Server Actions（getJobs / getJob / updateJobStatus / deleteJob）
+3. 更新职位列表页面 (`app/(main)/jobs/page.tsx`) 接入真实数据
+4. 更新职位详情页面 (`app/(main)/jobs/[id]/page.tsx`) 接入真实数据
+
+参考模式见：`actions/profile.ts`（服务端客户端 + getCurrentUser + from().select()）、`migrations/20260622023355_create-profiles-table.sql`（RLS 策略模板）
 
 ## Open questions
 
-- 职位搜索与匹配（第08步）需要 Browserbase + Stagehand，是否已准备好 API key
-- 简历生成与定制（第09步）需要 OpenRouter API key，需确认是否已配置
+- 职位搜索与匹配（第08步）需要 Browserbase + Stagehand API key
+- 简历生成与定制（第09步）需要 OpenRouter API key
