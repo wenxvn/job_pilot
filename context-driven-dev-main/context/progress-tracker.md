@@ -20,6 +20,7 @@
 - [x] 认证功能（登录 + 注册 + 邮箱验证 + 登出 + session 管理）
 - [x] 导航栏组件（认证状态感知）
 - [x] 首页仪表盘（登录/未登录两种状态）
+- [x] 首页视觉升级（Landing Page 完整重构 + Dashboard 丰富化 + CSS 动画系统）
 - [x] PostHog 分析集成（Provider + usePostHog hook + 事件追踪）
 - [x] 个人资料页面 UI（/profile）
 - [x] profiles 表创建（数据库迁移 + RLS 策略）
@@ -58,6 +59,7 @@
 - **2026-06-21** — 使用 Next.js 16 (proxy.ts 替代 middleware.ts)
 - **2026-06-21** — 认证采用 InsForge SSR 模式：createBrowserClient + createServerClient + createAuthActions
 - **2026-06-21** — 路由组：(auth) 用于登录/注册，(main) 用于主应用
+- **2026-06-22** — 首页视觉升级：Landing Page 增加浮动装饰、渐变光晕、四步流程、社会证明条；Dashboard 增加统计卡片、快捷操作列表、最近动态、求职小贴士；globals.css 新增 fade-in-up / float / gradient-shift / pulse-ring 动画系统
 - **2026-06-22** — profiles 表使用 JSONB 存储 experience 数组，TEXT[] 存储 skills
 - **2026-06-22** — resumes 存储桶设为 private，RLS 策略基于 key 前缀匹配 user_id
 - **2026-06-22** — 个人资料使用 upsert（onConflict: user_id），每个用户一条记录

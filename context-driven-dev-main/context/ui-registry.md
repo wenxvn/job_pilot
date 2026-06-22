@@ -44,23 +44,75 @@
   - 底部链接：`text-center text-sm text-text-secondary mt-6`
   - 链接高亮：`text-accent font-medium`
 
-### Dashboard Cards（首页功能卡片）
-- **文件：** `app/(main)/page.tsx`
-- **类型：** Client Component
-- **类名：**
-  - 卡片：`bg-surface border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow`
-  - 图标：`h-8 w-8 text-accent mb-3`
-  - 标题：`text-base font-semibold text-text-primary`
-  - 描述：`text-sm text-text-secondary mt-1`
-
 ### Landing Hero（首页未登录状态）
 - **文件：** `app/(main)/page.tsx`
+- **类型：** Client Component（LandingPage）
 - **类名：**
-  - 容器：`flex flex-col items-center justify-center min-h-[80vh] text-center`
-  - 标题：`text-4xl font-bold text-text-primary mb-4`
-  - 副标题：`text-lg text-text-secondary mb-8`
-  - CTA 按钮：`bg-accent text-accent-foreground rounded-md px-6 py-3 text-sm font-medium`
-  - 次要按钮：`bg-surface border border-border text-text-primary rounded-md px-6 py-3 text-sm font-medium`
+  - 背景光晕：`pointer-events-none absolute -top-32 -right-32 h-[500px] w-[500px] rounded-full bg-accent/[0.07] blur-3xl`
+  - 浮动装饰：`pointer-events-none absolute animate-float opacity-60` + `flex h-12 w-12 items-center justify-center rounded-xl bg-accent-light shadow-sm`
+  - 顶部徽章：`animate-fade-in-up stagger-1 mb-6 inline-flex items-center gap-2 rounded-full bg-accent-light px-4 py-1.5`
+  - 标题：`animate-fade-in-up stagger-2 mx-auto max-w-3xl text-4xl font-bold leading-tight tracking-tight text-text-primary sm:text-5xl lg:text-6xl`
+  - 渐变文字：`animate-gradient-shift bg-gradient-to-r from-accent via-info to-accent bg-clip-text text-transparent`
+  - 副标题：`animate-fade-in-up stagger-3 mx-auto mt-6 max-w-xl text-base leading-relaxed text-text-secondary sm:text-lg`
+  - CTA 按钮组：`animate-fade-in-up stagger-4 mt-10 flex flex-col items-center gap-4 sm:flex-row`
+  - 主按钮：`group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-accent px-7 py-3.5 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/25 transition-all hover:shadow-xl hover:shadow-accent/30 hover:brightness-110`
+  - 次要按钮：`inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-7 py-3.5 text-sm font-semibold text-text-primary shadow-sm transition-all hover:bg-surface-secondary hover:shadow-md`
+  - 社会证明条：`animate-fade-in-up stagger-5 mt-14 flex flex-wrap items-center justify-center gap-8`
+  - 统计数值：`text-2xl font-bold text-text-primary`
+  - 统计标签：`mt-0.5 text-xs text-text-muted`
+
+### Landing Features（首页功能卡片）
+- **文件：** `app/(main)/page.tsx`
+- **类型：** Client Component（LandingPage 内部）
+- **类名：**
+  - 区域标题：`text-2xl font-bold text-text-primary sm:text-3xl`
+  - 区域副标题：`mt-3 text-sm text-text-secondary`
+  - 卡片网格：`grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4`
+  - 功能卡片：`group relative overflow-hidden rounded-xl border border-border bg-surface p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg animate-fade-in-up stagger-N`
+  - 渐变顶部条：`absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-accent via-info to-accent opacity-0 transition-opacity group-hover:opacity-100`
+  - 图标容器：`mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-accent-light transition-colors group-hover:bg-accent group-hover:text-accent-foreground`
+  - 卡片标题：`text-sm font-semibold text-text-primary`
+  - 卡片描述：`mt-2 text-xs leading-relaxed text-text-secondary`
+
+### Landing Steps（首页使用流程）
+- **文件：** `app/(main)/page.tsx`
+- **类型：** Client Component（LandingPage 内部）
+- **类名：**
+  - 背景：`relative bg-surface px-4 py-20`
+  - 连接线：`absolute left-8 top-8 bottom-8 hidden w-px bg-gradient-to-b from-accent/40 via-info/40 to-success/40 sm:block`
+  - 步骤容器：`relative flex items-start gap-5 animate-fade-in-up stagger-N`
+  - 步骤编号：`relative z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-border bg-surface shadow-sm`
+  - 编号文字：`text-lg font-bold text-accent`
+  - 步骤标题：`text-base font-semibold text-text-primary`
+  - 步骤描述：`mt-1 text-sm text-text-secondary`
+  - 底部 CTA：`group inline-flex items-center gap-2 rounded-lg bg-accent px-8 py-3.5 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/25 transition-all hover:shadow-xl hover:brightness-110`
+
+### Dashboard（首页已登录状态）
+- **文件：** `app/(main)/page.tsx`
+- **类型：** Client Component（Dashboard）
+- **类名：**
+  - 欢迎区：`animate-fade-in-up relative overflow-hidden rounded-xl border border-border bg-surface p-6 shadow-sm`
+  - 欢迎光晕：`pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-accent/[0.06] blur-2xl`
+  - 欢迎标题：`text-2xl font-bold text-text-primary`
+  - 欢迎副标题：`mt-1 text-sm text-text-secondary`
+  - 统计卡片网格：`grid grid-cols-1 gap-4 sm:grid-cols-3`
+  - 统计卡片：`group flex items-center gap-4 rounded-xl border border-border bg-surface p-5 shadow-sm transition-all hover:shadow-md animate-fade-in-up stagger-N`
+  - 统计图标容器：`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg`（变体：`bg-accent-light`、`bg-success-light`、`bg-info-light`）
+  - 统计标签：`text-xs font-medium text-text-secondary`
+  - 统计数值：`mt-0.5 text-xl font-bold text-text-primary`
+  - 统计变化：`mt-0.5 text-xs text-text-muted`
+  - 快捷操作卡片：`group flex items-center gap-4 rounded-xl border border-border bg-surface p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md animate-fade-in-up stagger-N`
+  - 操作图标容器：`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg`（变体：`bg-accent-light`、`bg-info-light`、`bg-success-light`）
+  - 操作标题：`text-sm font-semibold text-text-primary`
+  - 操作描述：`mt-0.5 text-xs text-text-secondary`
+  - 操作箭头：`h-4 w-4 text-text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent`
+  - 最近动态容器：`rounded-xl border border-border bg-surface p-5 shadow-sm`
+  - 动态项：`flex items-start gap-3`
+  - 动态图标容器：`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg`
+  - 动态文本：`text-sm text-text-primary`
+  - 动态时间：`mt-0.5 flex items-center gap-1 text-xs text-text-muted`
+  - 求职小贴士标题：`flex items-center gap-1.5` + `text-xs font-semibold text-text-primary`
+  - 小贴士项：`flex items-start gap-2` + `mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent` + `text-xs leading-relaxed text-text-secondary`
 
 ### Profile Form（个人资料表单）
 - **文件：** `app/(main)/profile/page.tsx`
