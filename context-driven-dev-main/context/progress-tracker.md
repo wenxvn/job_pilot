@@ -1,7 +1,7 @@
 # 进度跟踪器
 
-**最后更新：** 2026-06-21
-**当前阶段：** 第一阶段 — 基础设施 → 第二阶段 — 核心页面
+**最后更新：** 2026-06-22
+**当前阶段：** 第二阶段 — 核心页面
 **总体状态：** 进行中
 
 ---
@@ -21,14 +21,18 @@
 - [x] 导航栏组件（认证状态感知）
 - [x] 首页仪表盘（登录/未登录两种状态）
 - [x] PostHog 分析集成（Provider + usePostHog hook + 事件追踪）
+- [x] 个人资料页面 UI（/profile）
+- [x] profiles 表创建（数据库迁移 + RLS 策略）
+- [x] resumes 存储桶创建（private + RLS 策略）
+- [x] 个人资料 Server Actions（getProfile / upsertProfile / uploadResume）
+- [x] 个人资料页面接入真实数据（加载 / 保存 / 简历上传）
+- [x] 职位列表页面 UI（/jobs）— 统计卡片、筛选排序、表格列表、匹配徽章
+- [x] 职位详情页面 UI（/jobs/[id]）— 职位信息、匹配详情、申请链接、简历操作
 
 ## 进行中
-- [ ] 个人资料页面 — 完整 UI
+- [ ] 职位管理 — 逻辑
 
 ## 待开始
-- [ ] 个人资料逻辑
-- [ ] 职位列表页面
-- [ ] 职位详情页面
 - [ ] 职位搜索与匹配
 - [ ] 简历生成与定制
 - [ ] 申请记录
@@ -54,6 +58,10 @@
 - **2026-06-21** — 使用 Next.js 16 (proxy.ts 替代 middleware.ts)
 - **2026-06-21** — 认证采用 InsForge SSR 模式：createBrowserClient + createServerClient + createAuthActions
 - **2026-06-21** — 路由组：(auth) 用于登录/注册，(main) 用于主应用
+- **2026-06-22** — profiles 表使用 JSONB 存储 experience 数组，TEXT[] 存储 skills
+- **2026-06-22** — resumes 存储桶设为 private，RLS 策略基于 key 前缀匹配 user_id
+- **2026-06-22** — 个人资料使用 upsert（onConflict: user_id），每个用户一条记录
+- **2026-06-22** — Server Actions 使用 InsForge SDK：client.auth.getCurrentUser() + client.database.from()
 
 ---
 
@@ -61,14 +69,20 @@
 
 **2026-06-21**
 - 创建和完善所有规范性文档
-- 确认项目技术栈和功能范围
 - 初始化 Next.js 16 项目，配置 Tailwind CSS v4、TypeScript 严格模式
 - 配置 InsForge SDK 客户端（浏览器 + 服务端）
 - 实现 SSR 认证：proxy.ts + auth-actions.ts + refresh route
-- 创建 AuthProvider + useAuth hook
-- 实现登录页面 `/login`（邮箱密码登录）
-- 实现注册页面 `/signup`（含邮箱验证流程）
-- 创建 Navbar 组件（认证状态感知导航）
-- 创建首页仪表盘（未登录展示 CTA，已登录展示功能卡片）
-- 所有页面通过 TypeScript 检查和构建验证
-- 下一步：个人资料页面 UI
+- 创建 AuthProvider + useAuth hook + Navbar + 首页仪表盘 + PostHog 集成
+
+**2026-06-22**
+- 创建个人资料页面 UI（模拟数据版）
+- InsForge CLI 登录并链接到 job_pilot 项目
+- 创建 profiles 表迁移（含 RLS 策略 + updated_at 触发器）
+- 创建 resumes 存储桶（private）+ 存储 RLS 策略
+- 创建 types/profile.ts 类型定义
+- 创建 actions/profile.ts（getProfile / upsertProfile / uploadResume）
+- 更新 profile 页面接入真实数据（加载 / 保存 / 简历上传）
+- 更新 ui-registry.md 和 progress-tracker.md
+- 修正 library-docs.md 中 InsForge SDK API（client.database.from()）
+- 创建职位列表页面 UI（/jobs）— 统计卡片、筛选排序、表格列表、匹配徽章
+- 创建职位详情页面 UI（/jobs/[id]）— 职位信息、匹配详情进度条、申请链接、简历操作

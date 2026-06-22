@@ -187,22 +187,22 @@ InsForge 提供官方 SDK 和 REST API，使用它们从应用代码中与 InsFo
 - **特别重要**：使用 Tailwind CSS v4。令牌使用 `@theme` 在 `globals.css` 中定义 — 颜色或令牌不需要 `tailwind.config.ts`。
 
 <!-- INSFORGE:START -->
-## InsForge 后端
+## InsForge backend
 
-本项目使用 [InsForge](https://insforge.dev)：一个一体化、开源的基于 Postgres 的后端（BaaS），为本应用提供数据库、认证、文件存储、边缘函数、实时通信、AI 模型网关和支付功能。
+This project uses [InsForge](https://insforge.dev): an all-in-one, open-source Postgres-based backend (BaaS) that gives this app a database, authentication, file storage, edge functions, realtime, an AI model gateway, and payments through one platform.
 
-- **项目：** **job_pilot**（API 基础 URL `https://9g5p2i2e.us-east.insforge.app`）
-- **技能：** 以下 InsForge 技能已为支持的编码代理安装。实现任何 InsForge 功能时请优先使用它们，而不是猜测 API：
-  - `insforge`：使用 `@insforge/sdk` 客户端编写应用代码（数据库 CRUD、认证、存储、边缘函数、实时通信、AI、邮件和 Stripe 支付）。
-  - `insforge-cli`：通过 `insforge` CLI 管理后端和基础设施（项目、SQL、迁移、RLS 策略、存储桶、函数、密钥、支付设置、定时任务、部署）。
-  - `insforge-debug`：诊断故障（SDK/HTTP 错误、RLS 拒绝、认证和 OAuth 问题）以及运行安全或性能审计。
-  - `insforge-integrations`：接入外部认证提供商（Clerk、Auth0、WorkOS、Better Auth 等）用于基于 JWT 的 RLS，或 OKX x402 支付中介。
-  - `find-skills`：按需发现更多技能。
-- **凭据：** 应用代码从 `.env.local` 读取密钥；CLI 读取 `.insforge/project.json`。永不硬编码或提交密钥。
+- **Project:** **job_pilot** (API base `https://9g5p2i2e.us-east.insforge.app`)
+- **Skills:** these InsForge skills are installed for supported coding agents. Reach for them before implementing any InsForge feature instead of guessing the API:
+  - `insforge`: app code with the `@insforge/sdk` client (database CRUD, auth, storage, edge functions, realtime, AI, email, and Stripe payments).
+  - `insforge-cli`: backend and infrastructure via the `insforge` CLI (projects, SQL, migrations, RLS policies, storage buckets, functions, secrets, payment setup, schedules, deploys).
+  - `insforge-debug`: diagnosing failures (SDK/HTTP errors, RLS denials, auth and OAuth issues) and running security or performance audits.
+  - `insforge-integrations`: wiring external auth providers (Clerk, Auth0, WorkOS, Better Auth, etc.) for JWT-based RLS, or the OKX x402 payment facilitator.
+  - `find-skills`: discovering additional skills on demand.
+- **Credentials:** app code reads keys from `.env.local`; the CLI reads `.insforge/project.json`. Never hardcode or commit keys.
 
-关键模式：
+Key patterns:
 
-- 数据库插入使用数组格式：`insert([{ ... }])`。
-- 引用用户使用 `auth.users(id)`；在 RLS 策略中使用 `auth.uid()`。
-- 存储上传时，同时保存返回的 `url` 和 `key`。
+- Database inserts take an array: `insert([{ ... }])`.
+- Reference users with `auth.users(id)`; use `auth.uid()` in RLS policies.
+- For storage uploads, persist both the returned `url` and `key`.
 <!-- INSFORGE:END -->

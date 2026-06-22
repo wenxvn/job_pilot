@@ -55,22 +55,29 @@ const client = createClient({
 
 ```typescript
 // 读取
-const { data, error } = await client
+const { data, error } = await client.database
   .from('jobs')
   .select('*')
   .eq('user_id', userId)
   .order('created_at', { ascending: false })
 
 // 写入（数组格式）
-const { data, error } = await client
+const { data, error } = await client.database
   .from('jobs')
   .insert([{ title, company, user_id: userId }])
 
 // 更新
-const { data, error } = await client
+const { data, error } = await client.database
   .from('jobs')
   .update({ status: 'applied' })
   .eq('id', jobId)
+
+// Upsert（冲突时更新）
+const { data, error } = await client.database
+  .from('profiles')
+  .upsert([{ user_id: userId, ...input }], { onConflict: 'user_id' })
+  .select()
+  .single()
 ```
 
 **规则：**

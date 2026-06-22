@@ -51,6 +51,7 @@ export function Navbar() {
           <div className="flex items-center gap-3">
             <Link
               href="/profile"
+              onClick={() => posthog.capture("nav_click", { destination: "/profile" })}
               className={`flex items-center gap-2 text-sm font-medium ${
                 pathname === "/profile" ? "text-accent" : "text-text-secondary"
               }`}
