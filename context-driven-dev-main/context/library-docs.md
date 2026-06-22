@@ -244,3 +244,39 @@ import { Search, Briefcase, FileText } from 'lucide-react'
 
 - 图标大小统一：16px（`w-4 h-4`）、20px（`w-5 h-5`）、24px（`w-6 h-6`）
 - 颜色继承父元素文本颜色
+
+---
+
+## PostHog
+
+用户行为分析和事件追踪。
+
+### 初始化
+
+在 `components/PostHogProvider.tsx` 中初始化，已集成到根布局。
+
+### 使用方式
+
+```typescript
+'use client'
+import { usePostHog } from '@/hooks/usePostHog'
+
+const { identify, reset, track } = usePostHog()
+
+// 用户登录后识别
+identify(userId, { email, name })
+
+// 追踪事件
+track('job_searched', { query, location })
+track('resume_generated', { jobId })
+
+// 用户登出时重置
+reset()
+```
+
+**规则：**
+
+- 永不在服务端代码中导入 PostHog
+- 用户登录后调用 `identify`，登出时调用 `reset`
+- 自定义事件命名使用 snake_case
+- 追踪的属性保持简洁，不包含敏感信息

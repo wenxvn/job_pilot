@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Briefcase, FileText, Send } from "lucide-react";
+import posthog from "posthog-js";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function HomePage() {
@@ -28,12 +29,14 @@ export default function HomePage() {
           <div className="flex items-center justify-center gap-4">
             <Link
               href="/signup"
+              onClick={() => posthog.capture("cta_click", { cta: "signup", source: "home_hero" })}
               className="bg-accent text-accent-foreground rounded-md px-6 py-3 text-sm font-medium"
             >
               免费开始
             </Link>
             <Link
               href="/login"
+              onClick={() => posthog.capture("cta_click", { cta: "login", source: "home_hero" })}
               className="bg-surface border border-border text-text-primary rounded-md px-6 py-3 text-sm font-medium"
             >
               登录
@@ -56,19 +59,19 @@ export default function HomePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Link href="/jobs" className="bg-surface border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <Link href="/jobs" onClick={() => posthog.capture("feature_card_click", { card: "jobs" })} className="bg-surface border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
           <Briefcase className="h-8 w-8 text-accent mb-3" />
           <h2 className="text-base font-semibold text-text-primary">职位</h2>
           <p className="text-sm text-text-secondary mt-1">浏览和管理已发现的职位</p>
         </Link>
 
-        <Link href="/resumes" className="bg-surface border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <Link href="/resumes" onClick={() => posthog.capture("feature_card_click", { card: "resumes" })} className="bg-surface border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
           <FileText className="h-8 w-8 text-accent mb-3" />
           <h2 className="text-base font-semibold text-text-primary">简历</h2>
           <p className="text-sm text-text-secondary mt-1">创建和定制你的简历</p>
         </Link>
 
-        <Link href="/applications" className="bg-surface border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <Link href="/applications" onClick={() => posthog.capture("feature_card_click", { card: "applications" })} className="bg-surface border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
           <Send className="h-8 w-8 text-accent mb-3" />
           <h2 className="text-base font-semibold text-text-primary">投递记录</h2>
           <p className="text-sm text-text-secondary mt-1">跟踪你的投递状态</p>

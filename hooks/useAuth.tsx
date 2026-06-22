@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { insforge } from "@/lib/insforge/client";
 
 interface User {
@@ -42,7 +42,7 @@ async function fetchCurrentUser(): Promise<User | null> {
   }
 }
 
-export function AuthProvider({ children }: { children: ReactNode }): React.JSX.Element {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 

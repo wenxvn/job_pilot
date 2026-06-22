@@ -31,6 +31,7 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => posthog.capture("nav_click", { destination: item.href })}
                   className={`text-sm font-medium ${
                     isActive ? "text-accent" : "text-text-secondary"
                   }`}
