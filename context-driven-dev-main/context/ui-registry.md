@@ -180,6 +180,7 @@
 ### ResumeSection（简历管理）
 - **文件：** `components/features/profile/ResumeSection.tsx`
 - **类型：** Client Component
+- **数据规则：** 简历存储桶为 private，查看文件固定打开 `/api/profile/resume/view`，由服务端验证当前用户并以内联 PDF 响应；组件不直连 InsForge storage public URL
 - **类名：**
   - 卡片容器：`group relative overflow-hidden rounded-xl border border-border bg-surface p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md animate-fade-in-up stagger-4`
   - 渐变顶条：`absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-info via-accent to-info opacity-0 transition-opacity group-hover:opacity-100`

@@ -5,6 +5,8 @@ import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { revalidatePath } from "next/cache";
 import type { Profile, ProfileInput } from "@/types/profile";
 
+const RESUME_VIEW_URL = "/api/profile/resume/view";
+
 export async function getProfile(): Promise<{ profile: Profile | null; error: string | null }> {
   try {
     const client = await createInsForgeServerClient();
@@ -78,7 +80,7 @@ async function uploadResumeWithOverwrite(
   client: Awaited<ReturnType<typeof createInsForgeServerClient>>,
   key: string,
   file: File
-): Promise<string | null> {
+): Promise<boolean> {
   const bucket = client.storage.from("resumes");
   let uploadResult = await bucket.upload(key, file);
 
@@ -88,16 +90,10 @@ async function uploadResumeWithOverwrite(
   }
 
   if (uploadResult.error || !uploadResult.data) {
-    return null;
+    return false;
   }
 
-  const urlResult = bucket.getPublicUrl(key);
-
-  if (!urlResult.data) {
-    return null;
-  }
-
-  return urlResult.data.publicUrl;
+  return true;
 }
 
 export async function uploadResume(
@@ -117,9 +113,9 @@ export async function uploadResume(
     if (file.size > 10 * 1024 * 1024) return null;
 
     const key = `${userId}/resume.pdf`;
-    const publicUrl = await uploadResumeWithOverwrite(client, key, file);
+    const uploaded = await uploadResumeWithOverwrite(client, key, file);
 
-    if (!publicUrl) return null;
+    if (!uploaded) return null;
 
     const { data: currentProfile, error: profileError } = await client.database
       .from("profiles")
@@ -148,7 +144,7 @@ export async function uploadResume(
         preferred_locations: [],
         industries: [],
       },
-      resume_file_url: publicUrl,
+      resume_file_url: RESUME_VIEW_URL,
       resume_file_key: key,
     };
     const completion = calculateProfileCompletion(profileInput);
@@ -171,7 +167,7 @@ export async function uploadResume(
     if (updateError) return null;
 
     revalidatePath("/profile");
-    return { url: publicUrl, key };
+    return { url: RESUME_VIEW_URL, key };
   } catch {
     return null;
   }

@@ -29,6 +29,7 @@
 - [x] 个人资料 Server Actions（getProfile / upsertProfile / uploadResume）
 - [x] 个人资料页面接入真实数据（加载 / 保存 / 简历上传）
 - [x] 个人资料表单完整接入 InsForge DB/Storage（固定简历路径覆盖 + 上传后立即写回 profile + 完成度落库）
+- [x] 简历 PDF 私有存储查看修复（/api/profile/resume/view 服务端验证并以内联 PDF 打开新页面）
 - [x] 个人资料页面视觉增强（完成度环 + 模块进度条 + 卡片 hover 动画 + stagger 入场）
 - [x] 完整个人资料页面（ProfileAttentionBanner + ConnectedAccounts + ResumeSection + 五段 ProfileForm + Navbar 当前页状态）
 - [x] 职位列表页面 UI（/jobs）— 统计卡片、筛选排序、表格列表、匹配徽章
@@ -70,6 +71,7 @@
 - **2026-06-22** — Server Actions 使用 InsForge SDK：client.auth.getCurrentUser() + client.database.from()
 - **2026-06-26** — 完整个人资料扩展沿用 profiles 单表，新增 phone、bio、education、job_preferences 字段；教育经历和求职偏好使用 JSONB，保持一次保存完整资料
 - **2026-06-26** — 个人资料完成度使用统一函数计算并落库；基础简历固定保存到 resumes/{user_id}/resume.pdf，上传后立即写回 profiles
+- **2026-06-26** — private resumes bucket 不使用 public URL 查看；`resume_file_url` 保存同域查看入口 `/api/profile/resume/view`，Route Handler 验证当前用户后以内联 PDF 响应
 
 ---
 
@@ -104,3 +106,4 @@
 - 新增个人资料完成度字段迁移：is_complete、completion_percentage、missing_fields
 - 新增共享完成度计算函数，并让 Server Action 与 ProfileAttentionBanner 使用同一套必填字段口径
 - 简历上传改为固定 key 覆盖，上传成功后立即更新 profiles 中的 resume_file_url / resume_file_key
+- 修复 private bucket 简历查看 401：新增 `/api/profile/resume/view` 服务端 PDF 查看路由，ResumeSection 的“查看文件”改为打开同域新页面

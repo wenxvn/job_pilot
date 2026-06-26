@@ -109,7 +109,7 @@ export function ResumeSection({
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-text-primary truncate">已上传简历</p>
               <a
-                href={resumeUrl}
+                href="/api/profile/resume/view"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-accent hover:underline"
