@@ -1,53 +1,50 @@
-# Memory — 个人资料页面视觉增强
+# Memory — Profile 表单接入 InsForge DB/Storage
 
-Last updated: 2026-06-22
+Last updated: 2026-06-26 10:55 CST
 
 ## What was built
 
-- **app/(main)/profile/page.tsx** — 个人资料页面视觉增强重写：
-  - **头部欢迎区**：装饰光晕（accent/info 双色）、Sparkles 徽章、个性化问候语（"你好，{姓名}"）、动态文案提示
-  - **SVG 扇形完成度环**：`CompletionRing` 组件，140px 圆环 + stroke-dashoffset 动画、根据完成百分比变色（accent → warning → info → success）、中心显示百分比 + 状态标签
-  - **模块进度检查项**：`SectionProgress` 组件，每张卡片右侧显示 Checklist（CheckCircle2/Circle 图标 + 进度条 + 计数），MD 以上屏幕可见
-  - **完成度计算逻辑**：`useMemo` 计算 5 大类 11 项指标（基本信息 3 项、求职意向 2 项、技能 2 项、经历 2 项、简历 1 项），实时百分比
-  - **卡片交互升级**：`group` hover 效果（translate-y -0.5 + shadow-md）、渐变顶条（group-hover:opacity-100）、图标容器 scale-105、`stagger-1` 到 `stagger-6` 逐项延迟入场
-  - **技能标签**：逐项 fade-in-up 动画（50ms 间隔）、hover 过渡效果
-  - **工作经验空状态**：添加 Briefcase 图标，更好的视觉引导
-  - **简历区域**：图标容器改为 rounded-xl、上传区域添加 hover:border-accent/40 + hover:bg-accent 过渡
-  - **底部保存栏**：独立卡片化、hover:shadow-accent/20 光影效果
-- **app/globals.css** — 新增 `@keyframes profile-ring-in`（从 --ring-circ 动画到 --ring-target）+ `.animate-profile-ring-in` 工具类
-- **context-driven-dev-main/context/ui-registry.md** — Profile Page 注册表完整更新（从 "Profile Form" 改名为 "Profile Page"，新增完成度环/模块进度/卡片动画等所有类名）
-- **context-driven-dev-main/context/progress-tracker.md** — 新增已完成项"个人资料页面视觉增强"
+- **actions/profile.ts** — `upsertProfile` 现在保存完整 profile 表单字段，并同步写入 `is_complete`、`completion_percentage`、`missing_fields`；`uploadResume` 改为固定上传到 `resumes/{user_id}/resume.pdf`，上传后立即写回 `profiles.resume_file_url` / `resume_file_key` 并重新计算完成度。
+- **lib/profile-completion.ts** — 新增统一完成度计算函数，按 10 项必填字段计算完成度和缺失字段。
+- **types/profile.ts** — 新增 `MissingProfileField`、`ProfileCompletion` 和 profile 完成度字段；`ProfileInput` 排除派生字段，只保留用户可提交字段。
+- **components/features/profile/ProfileAttentionBanner.tsx** — 改为复用 `lib/profile-completion.ts`，前端提醒与服务端落库使用同一口径。
+- **app/(main)/profile/page.tsx** — 预览 profile 补齐派生完成度字段，适配新的 `ProfileInput`。
+- **migrations/20260626102000_add-profile-completion-fields.sql** — 新增 `is_complete`、`completion_percentage`、`missing_fields` 字段迁移。
+- **context-driven-dev-main/context/progress-tracker.md** 和 **ui-registry.md** — 记录 profile DB/Storage 接入与完成度规则。
+- 已通过 InsForge CLI 链接项目并将以下迁移导入远端 InsForge：`20260626093000_add-complete-profile-fields.sql`、`20260626102000_add-profile-completion-fields.sql`。
 
 ## Decisions made
 
-- 完成度环使用 SVG circle + CSS 自定义属性 `--ring-circ` / `--ring-target` + `profile-ring-in` 关键帧动画，避免内联 strokeDashoffset 动画不可用的问题
-- 每个模块卡片使用 `group` + `hover:-translate-y-0.5` + `hover:shadow-md` 交互，与 Dashboard 快捷操作卡片风格一致
-- SectionProgress 在 `md:` 断点以下隐藏（`hidden md:block`），避免移动端过于拥挤
-- 完成度百分比颜色分级：<25 accent、<50 warning、<80 info、≥80 success
-- 所有输入框添加 `transition-shadow` 以平滑焦点环变化
+- 图片中的 `resume_pdf_url` 在本项目中继续对应现有字段 `resume_file_url`，不改名。
+- 基础简历固定使用 `resumes/{user_id}/resume.pdf`，通过上传失败后删除旧对象并重试的方式实现覆盖。
+- 完成度派生状态落库到 `profiles`，但不由表单输入直接提交；统一由 `calculateProfileCompletion` 计算。
+- `missing_fields` 使用 JSONB 存储结构化缺失字段对象数组。
+- 必填口径为 10 项：姓名、邮箱、手机号、所在地、目标职位、个人简介、至少 3 个技能、至少 1 段工作经历、至少 1 段教育经历、已上传简历。
 
 ## Problems solved
 
-- SVG 进度环动画：不能直接用 strokeDashoffset 属性驱动动画，改用 CSS keyframes + 自定义属性方案
+- 远端 InsForge 未保存新增字段的原因是迁移只存在本地文件，尚未执行到远端；本轮安装/使用 InsForge CLI 后已导入迁移并查询确认字段存在。
+- InsForge SDK 当前 `storage.upload(path, file)` 没有 `upsert` 参数；已用固定 key + 删除旧对象重试实现等效覆盖。
+- `ProfileInput` 如果直接继承新增完成度字段会迫使页面手动构造派生字段；已把派生字段从 `ProfileInput` 排除。
 
 ## Current state
 
-- 个人资料页面视觉增强已完成，TypeScript 编译零错误
-- 已提交并推送到远程仓库
-- 职位列表/详情页面仍使用模拟数据，尚未接入数据库
-- 构建计划第 07 步（职位管理逻辑）尚未开始
+- `npx tsc --noEmit` 通过。
+- `npm run build` 通过。
+- 本地开发服务器已启动在 `http://localhost:3000`（session id 21464）。
+- 远端 InsForge `profiles` 表已确认包含 `phone`、`bio`、`education`、`job_preferences`、`is_complete`、`completion_percentage`、`missing_fields`。
+- `resumes` storage bucket 存在且仍为 private。
+- 当前工作区有未提交改动，包括本轮 profile 逻辑改动、前一轮完整 profile UI 改动、`next-env.d.ts` 生成路径变化、`memory.md` 更新，以及未跟踪的 `components/features/`、`lib/profile-completion.ts`、迁移文件和 `skills-lock.json`。
 
 ## Next session starts with
 
-继续构建计划第 07 步：**职位管理 — 逻辑**
-1. 创建 `jobs` 表迁移（SQL + RLS 策略）+ `types/job.ts` 类型定义
-2. 创建 `actions/job.ts` Server Actions（getJobs / getJob / updateJobStatus / deleteJob）
-3. 更新职位列表页面 (`app/(main)/jobs/page.tsx`) 接入真实数据
-4. 更新职位详情页面 (`app/(main)/jobs/[id]/page.tsx`) 接入真实数据
-
-参考模式见：`actions/profile.ts`（服务端客户端 + getCurrentUser + from().select()）、`migrations/20260622023355_create-profiles-table.sql`（RLS 策略模板）
+1. 打开 `http://localhost:3000/profile`，登录后手动验证保存完整资料、刷新预填、完成度/缺失字段展示、PDF 上传后无需再次保存即可持久化。
+2. 如上传简历查看链接在 private bucket 下不可访问，决定是否改为 signed URL 或调整 bucket/下载策略。
+3. 若 profile 验证通过，继续构建计划第 07 步：职位管理逻辑（jobs 表迁移、`types/job.ts`、`actions/job.ts`、职位列表/详情页接真实数据）。
 
 ## Open questions
 
-- 职位搜索与匹配（第08步）需要 Browserbase + Stagehand API key
-- 简历生成与定制（第09步）需要 OpenRouter API key
+- `next-env.d.ts` 的 dev/build 生成路径变化是否保留，还是提交前恢复。
+- `skills-lock.json` 是否需要纳入版本控制。
+- Profile 保存/上传流程还需要浏览器实测一次；当前只完成了类型检查、生产构建和远端 schema 验证。
+- 职位搜索与匹配仍需要 Browserbase/Stagehand 配置；简历生成与定制仍需要 OpenRouter 配置。

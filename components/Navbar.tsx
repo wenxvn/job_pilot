@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/jobs", label: "职位" },
   { href: "/resumes", label: "简历" },
   { href: "/applications", label: "投递记录" },
+  { href: "/profile", label: "个人资料" },
 ];
 
 export function Navbar() {
@@ -26,7 +27,8 @@ export function Navbar() {
         {user && (
           <nav className="flex items-center gap-6">
             {NAV_ITEMS.map((item) => {
-              const isActive = pathname.startsWith(item.href);
+              const isActive =
+                pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
                 <Link
                   key={item.href}
@@ -52,9 +54,7 @@ export function Navbar() {
             <Link
               href="/profile"
               onClick={() => posthog.capture("nav_click", { destination: "/profile" })}
-              className={`flex items-center gap-2 text-sm font-medium ${
-                pathname === "/profile" ? "text-accent" : "text-text-secondary"
-              }`}
+              className="flex items-center gap-2 text-sm font-medium text-text-secondary"
             >
               <User className="h-4 w-4" />
               {user.name ?? user.email}
