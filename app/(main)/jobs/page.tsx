@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, Filter, ArrowUpDown, Briefcase, MapPin, Building2, ExternalLink, ChevronDown } from "lucide-react";
 import posthog from "posthog-js";
@@ -78,6 +78,7 @@ const MOCK_JOBS = [
 
 type JobStatus = "all" | "saved" | "applied" | "interviewing" | "rejected";
 type SortField = "match_score" | "discovered_at";
+type MatchFilter = "all" | "high" | "medium" | "low";
 
 const STATUS_LABELS: Record<string, string> = {
   saved: "已保存",
@@ -117,13 +118,21 @@ export default function JobsPage() {
   const [sortAsc, setSortAsc] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [jobQuery, setJobQuery] = useState("");
+  const [locationQuery, setLocationQuery] = useState("");
+  const [listQuery, setListQuery] = useState("");
+  const [matchFilter, setMatchFilter] = useState<MatchFilter>("all");
 
-  const filteredJobs = MOCK_JOBS
+  const filteredJobs = useMemo(() => MOCK_JOBS
     .filter((job) => statusFilter === "all" || job.status === statusFilter)
+    .filter((job) => !jobQuery.trim() || job.title.toLowerCase().includes(jobQuery.trim().toLowerCase()))
+    .filter((job) => !locationQuery.trim() || job.location.toLowerCase().includes(locationQuery.trim().toLowerCase()))
+    .filter((job) => !listQuery.trim() || `${job.title} ${job.company} ${job.location}`.toLowerCase().includes(listQuery.trim().toLowerCase()))
+    .filter((job) => matchFilter === "all" || (matchFilter === "high" ? job.match_score >= 85 : matchFilter === "medium" ? job.match_score >= MATCH_THRESHOLD && job.match_score < 85 : job.match_score < MATCH_THRESHOLD))
     .sort((a, b) => {
       const diff = a[sortField] > b[sortField] ? 1 : -1;
       return sortAsc ? diff : -diff;
-    });
+    }), [jobQuery, locationQuery, listQuery, matchFilter, sortAsc, sortField, statusFilter]);
 
   const stats = {
     total: MOCK_JOBS.length,
@@ -134,6 +143,27 @@ export default function JobsPage() {
 
   return (
     <div className="space-y-6">
+      <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm md:p-6">
+        <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
+          <label className="space-y-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-text-secondary">职位名称</span>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+              <input value={jobQuery} onChange={(event) => setJobQuery(event.target.value)} onKeyDown={(event) => event.key === "Enter" && posthog.capture("job_search_started", { search_query: jobQuery, location: locationQuery })} placeholder="例如：前端工程师" className="w-full rounded-md border border-border bg-surface px-3 py-3 pl-10 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-accent focus:ring-1 focus:ring-accent" />
+            </div>
+          </label>
+          <label className="space-y-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-text-secondary">工作地点</span>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+              <input value={locationQuery} onChange={(event) => setLocationQuery(event.target.value)} onKeyDown={(event) => event.key === "Enter" && posthog.capture("job_search_started", { search_query: jobQuery, location: locationQuery })} placeholder="例如：上海、杭州或远程" className="w-full rounded-md border border-border bg-surface px-3 py-3 pl-10 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-accent focus:ring-1 focus:ring-accent" />
+            </div>
+          </label>
+          <button type="button" onClick={() => posthog.capture("job_search_started", { search_query: jobQuery, location: locationQuery })} className="inline-flex items-center justify-center gap-2 rounded-md bg-accent px-5 py-3 text-sm font-medium text-accent-foreground hover:bg-accent-dark">
+            <Search className="h-4 w-4" />搜索职位
+          </button>
+        </div>
+      </div>
       {/* 页面标题 */}
       <div>
         <h1 className="text-2xl font-bold text-text-primary">职位列表</h1>
@@ -236,14 +266,21 @@ export default function JobsPage() {
 
         <div className="flex-1" />
 
-        {/* 搜索（纯 UI 展示） */}
-        <div className="relative hidden md:block">
+        <div className="relative min-w-0 flex-1 md:max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
           <input
             type="text"
-            placeholder="搜索职位或公司…"
-            className="bg-surface border border-border rounded-md pl-9 pr-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent w-64"
+            value={listQuery}
+            onChange={(event) => setListQuery(event.target.value)}
+            placeholder="按公司、职位或地点筛选…"
+            className="w-full rounded-md border border-border bg-surface py-2 pl-9 pr-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-accent focus:ring-1 focus:ring-accent"
           />
+        </div>
+
+        <div className="relative">
+          <button type="button" onClick={() => { setMatchFilter(matchFilter === "all" ? "high" : matchFilter === "high" ? "medium" : matchFilter === "medium" ? "low" : "all"); setShowFilterMenu(false); }} className="flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-sm font-medium text-text-primary hover:bg-surface-secondary">
+            匹配：{matchFilter === "all" ? "全部" : matchFilter === "high" ? "高匹配" : matchFilter === "medium" ? "中匹配" : "低匹配"}<ChevronDown className="h-3 w-3 text-text-muted" />
+          </button>
         </div>
       </div>
 

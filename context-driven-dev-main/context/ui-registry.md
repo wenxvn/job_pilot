@@ -221,6 +221,7 @@
 ### Jobs Page（职位列表页面）
 - **文件：** `app/(main)/jobs/page.tsx`
 - **类型：** Client Component
+- **搜索交互：** 顶部职位名称/地点搜索卡片，列表内支持按公司、职位或地点实时筛选；匹配筛选支持全部、高匹配、中匹配、低匹配。
 - **类名：**
   - 统计卡片：`bg-surface border border-border rounded-xl p-4 shadow-sm`
   - 统计标签：`text-xs font-medium text-text-secondary uppercase`
@@ -262,3 +263,17 @@
   - 匹配进度条（高）：`h-full rounded-full bg-success`
   - 匹配进度条（中）：`h-full rounded-full bg-info`
   - 匹配进度条（低）：`h-full rounded-full bg-warning`
+
+### Resumes Page（简历生成页面）
+- **文件：** `app/(main)/resumes/page.tsx`
+- **类型：** Server Component；预览交互由 `components/features/resume/ResumePreview.tsx` 提供
+- **类名：**
+  - 欢迎区：`animate-fade-in-up relative overflow-hidden rounded-xl border border-border bg-surface p-6 shadow-sm`
+  - 信息卡片：`rounded-xl border border-border bg-surface p-5 shadow-sm`
+  - 编辑按钮：`inline-flex items-center gap-2 rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-surface-secondary`
+  - 预览卡片：`overflow-hidden rounded-xl border border-border bg-surface shadow-sm`
+  - 预览工具栏：`flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between`
+  - 次要操作按钮：`inline-flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-surface-secondary`
+  - 主下载按钮：`inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-all hover:brightness-110 hover:shadow-md hover:shadow-accent/20`
+  - PDF 预览框：`h-[75vh] min-h-[640px] w-full bg-surface-secondary`
+- **模式说明：** 预览和下载使用同一受保护 Route Handler；资料编辑仍回到 `/profile`，保存后通过“刷新预览”更新。

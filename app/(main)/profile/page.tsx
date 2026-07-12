@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
 import { ConnectedAccounts } from "@/components/features/profile/ConnectedAccounts";
 import { ProfileAttentionBanner } from "@/components/features/profile/ProfileAttentionBanner";
@@ -105,6 +106,7 @@ function applyExtractedProfile(
 }
 
 export default function ProfilePage() {
+  const router = useRouter();
   const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileInput>(EMPTY_PROFILE);
   const [skillInput, setSkillInput] = useState("");
@@ -157,9 +159,8 @@ export default function ProfilePage() {
   }
 
   function handleGenerateResume() {
-    setInfo("简历生成将在后续简历定制阶段接入。");
     posthog.capture("resume_generate_clicked", { source: "profile" });
-    setTimeout(() => setInfo(null), 3000);
+    router.push("/resumes");
   }
 
   async function handleExtractResumeProfile() {

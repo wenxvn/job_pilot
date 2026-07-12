@@ -251,6 +251,23 @@ apply-{job_id}  // 例如：apply-abc123
 
 ---
 
+## @react-pdf/renderer
+
+用于服务端将已保存的 Profile 数据渲染为 PDF。模板位于 `lib/resume-pdf.tsx`，Route Handler 在生成前验证当前用户身份。
+
+```typescript
+import { renderToBuffer } from '@react-pdf/renderer'
+
+const buffer = await renderToBuffer(<ResumeDocument profile={profile} />)
+```
+
+**规则：**
+
+- 仅在 Node.js Route Handler 中使用，设置 `runtime = "nodejs"`
+- 中文字体从项目 `assets/fonts/` 注册并嵌入，不依赖服务器系统字体
+- 预览和下载必须复用同一个 PDF 生成模块
+- 生成版 PDF 不覆盖 InsForge 中用户上传的原始简历
+
 ## shadcn/ui
 
 基于 Radix UI 的组件库。

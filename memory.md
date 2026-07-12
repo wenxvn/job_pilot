@@ -1,42 +1,42 @@
-# Memory — 简历 PDF 文字识别与 Profile 回填
+# Memory — 职位页面中文搜索与筛选
 
 Last updated: 2026-07-12 CST
 
 ## What was built
 
-- `actions/profile.ts` 已接入阿里云百炼 `qwen3.5-ocr`：通过 InsForge 私有简历文件生成 5 分钟签名 URL，将 PDF 直接交给 OCR 模型并解析为结构化 Profile JSON。
-- OCR 结果会过滤模板标题/姓名误识别，去重工作和教育经历，并保护空字段；识别结果只回填页面，不自动写入数据库。
-- `app/(main)/profile/page.tsx` 与 `components/features/profile/ResumeSection.tsx` 已更新识别状态、失败提示和操作文案，用户检查后点击“保存资料”才持久化。
-- 已移除因百炼免费额度耗尽而失败的 GLM-5 二次结构化调用，以及未使用的 `openai`、`pdf-parse` 依赖和旧 Next worker 配置。
-- 已同步更新 `context-driven-dev-main/context/library-docs.md`、`code-standards.md`、`ui-registry.md`、`progress-tracker.md`。
+- 更新 `app/(main)/jobs/page.tsx`：新增中文职位名称和工作地点搜索卡片，支持输入后实时过滤职位。
+- 修复原列表搜索框仅展示、无法使用的问题；现在可按公司、职位或地点进行全文筛选。
+- 新增匹配分段筛选（全部、高匹配、中匹配、低匹配），并保留原有状态筛选、匹配分数/发现时间排序。
+- 搜索按钮和输入框回车会记录 `job_search_started` 事件，但当前职位数据仍是页面内模拟数据。
+- 更新 `context-driven-dev-main/context/ui-registry.md` 与 `context-driven-dev-main/context/progress-tracker.md`，登记职位页面搜索交互。
 
 ## Decisions made
 
-- 默认 OCR 模型由 `BAILIAN_OCR_MODEL` 配置，未配置时使用 `qwen3.5-ocr`；当前不依赖 GLM-5 或其他文本模型。
-- 简历继续存放在 InsForge private bucket；识别时仅生成短期签名 URL，不生成公开 URL、不在本地落盘。
-- 识别结果不自动写数据库，避免 OCR 误识别直接覆盖用户资料。
-- 保留自定义 JSON 提示解析，不使用实验性的 `result_schema`，因为该方案会把字段说明错误回填为字段值。
+- 首版搜索继续沿用现有 Client Component 和模拟职位数据，不新增 API 或数据库逻辑；后续接入真实职位搜索时可复用现有搜索状态和筛选体验。
+- 职位名称和地点使用独立条件，列表搜索使用公司、职位、地点的组合全文匹配。
+- 匹配筛选阈值继续使用 `lib/utils.ts` 中的 `MATCH_THRESHOLD`，遵守项目约定。
 
 ## Problems solved
 
-- 解决 PDF 无法直接读取的问题：OCR 模型可直接读取 PDF 签名 URL，不再依赖本地 PDF 文本解析。
-- 解决 OCR 常见脏数据：模板标题被当作姓名、经历重复、字段为空时覆盖已有页面值。
-- `AbortError` 已确认来自 PostHog 日志，与简历识别失败无关。
+- 修复搜索输入没有 `value`、`onChange` 和过滤条件导致的“搜索功能不可用”。
+- 补齐了用户截图所需的中文搜索区域和中文筛选文案。
 
 ## Current state
 
-- 已通过 `npx tsc --noEmit`、`npm run build`、`git diff --check`。
-- 使用真实登录账号完成端到端验证：识别请求返回 `200`，页面成功回填姓名、手机号、技能和工作经历；仍需用户手动点击“保存资料”。
-- 本地开发服务器仍运行在 `http://localhost:3000`，已登录的 Profile 页面可继续验证。
-- 工作区包含未提交的 Profile/OCR 改动；未发现密钥、token 或密码写入记忆。
+- `npx tsc --noEmit`、`npm run build`、`git diff --check` 均通过。
+- 职位页面当前显示模拟数据；真实职位管理、数据库查询和 Browserbase/Stagehand 搜索尚未实现。
+- 工作区包含本次职位页面改动，以及此前 Profile/OCR 和中文 PDF 简历功能的未提交改动。
+- 未在记忆中保存任何密钥、token、密码或其他敏感值。
 
 ## Next session starts with
 
-1. 刷新 `http://localhost:3000/profile`，点击“识别并填充”，检查所有回填字段后点击“保存资料”，再刷新确认持久化。
-2. 运行 `git status --short`，确认最终改动范围并决定是否提交。
-3. Profile 稳定后，继续构建计划第 07 步：职位管理逻辑（jobs 迁移、`types/job.ts`、`actions/job.ts`、列表/详情页真实数据）。
+1. 启动开发服务器并打开 `/jobs`，手动验证职位名称、地点、全文搜索和匹配筛选的交互。
+2. 检查移动端布局，必要时为筛选工具栏增加换行或响应式调整。
+3. 继续构建计划第 07 步职位管理逻辑：接入 `jobs` 表、用户限定查询、状态更新和真实列表数据。
+4. 真实职位搜索接入前，按项目要求读取 InsForge/Browsebase/Stagehand 相关技能与文档。
 
 ## Open questions
 
-- 是否需要为 private bucket 中的简历预览/下载增加独立 signed URL 接口。
-- 职位搜索与匹配仍需要 Browserbase/Stagehand 配置；简历生成与定制仍需要 OpenRouter 配置。
+- 搜索按钮目前只执行本地模拟数据过滤并记录事件；是否需要后续触发 LinkedIn/Browserbase 远程搜索。
+- 职位列表最终字段、分页、空状态和排序规则在接入真实 `jobs` 表后是否需要调整。
+- 中文 PDF 简历仍需要登录态浏览器验证长内容分页和下载效果。
