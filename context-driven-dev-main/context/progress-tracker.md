@@ -1,6 +1,6 @@
 # 进度跟踪器
 
-**最后更新：** 2026-06-26
+**最后更新：** 2026-07-12
 **当前阶段：** 第二阶段 — 核心页面
 **总体状态：** 进行中
 
@@ -30,6 +30,7 @@
 - [x] 个人资料页面接入真实数据（加载 / 保存 / 简历上传）
 - [x] 个人资料表单完整接入 InsForge DB/Storage（固定简历路径覆盖 + 上传后立即写回 profile + 完成度落库）
 - [x] 简历 PDF 私有存储查看修复（/api/profile/resume/view 服务端验证并以内联 PDF 打开新页面）
+- [x] 简历 PDF AI 识别回填（qwen3.5-ocr 单次完成文字型/扫描版 PDF 读取、结构化与页面表单覆盖回填）
 - [x] 个人资料页面视觉增强（完成度环 + 模块进度条 + 卡片 hover 动画 + stagger 入场）
 - [x] 完整个人资料页面（ProfileAttentionBanner + ConnectedAccounts + ResumeSection + 五段 ProfileForm + Navbar 当前页状态）
 - [x] 职位列表页面 UI（/jobs）— 统计卡片、筛选排序、表格列表、匹配徽章
@@ -72,6 +73,12 @@
 - **2026-06-26** — 完整个人资料扩展沿用 profiles 单表，新增 phone、bio、education、job_preferences 字段；教育经历和求职偏好使用 JSONB，保持一次保存完整资料
 - **2026-06-26** — 个人资料完成度使用统一函数计算并落库；基础简历固定保存到 resumes/{user_id}/resume.pdf，上传后立即写回 profiles
 - **2026-06-26** — private resumes bucket 不使用 public URL 查看；`resume_file_url` 保存同域查看入口 `/api/profile/resume/view`，Route Handler 验证当前用户后以内联 PDF 响应
+- **2026-06-26** — 简历 AI 识别使用 `pdf-parse` 抽取文字，再调用阿里云百炼 OpenAI 兼容 `glm-5` 输出 JSON；识别结果只覆盖页面表单状态，仍需用户手动保存
+- **2026-06-28** — 修复 GLM-5 识别超时：百炼 GLM 默认思考模式导致非流式 JSON 抽取超时，已在请求中传 `enable_thinking: false` 并缩短提示词
+- **2026-06-28** — 修复 Next/Turbopack Server Action 中 `pdf-parse` worker 加载失败：`pdf-parse` / `pdfjs-dist` 设为 server external，并显式使用 `file://` worker URL
+- **2026-07-12** — 简历识别采用两阶段策略：文字型 PDF 优先本地提取，文字为空或过少时通过 InsForge 5 分钟签名 URL 与 `qwen3.5-ocr` Responses API 解析扫描件，再交由 GLM-5 结构化回填
+- **2026-07-12** — GLM-5 与 qwen-plus 因账户级免费额度耗尽返回 403；简历识别改为 `qwen3.5-ocr` 单模型链路，使用 PDF + 自定义 JSON 提示直接生成 Profile 字段
+- **2026-07-12** — 真实简历端到端识别通过；服务端增加工作/教育经历去重和模板标题姓名过滤，页面回填时不再用空识别结果覆盖已有资料
 
 ---
 
@@ -107,3 +114,6 @@
 - 新增共享完成度计算函数，并让 Server Action 与 ProfileAttentionBanner 使用同一套必填字段口径
 - 简历上传改为固定 key 覆盖，上传成功后立即更新 profiles 中的 resume_file_url / resume_file_key
 - 修复 private bucket 简历查看 401：新增 `/api/profile/resume/view` 服务端 PDF 查看路由，ResumeSection 的“查看文件”改为打开同域新页面
+- 新增简历 PDF AI 识别回填：ResumeSection 增加“AI 识别并填充”，服务端读取 private PDF、抽取文字、调用百炼结构化，再回填 Profile 页面状态
+- 排查并修复 AI 识别失败：确认不是 GLM-5 识图能力问题，而是未关闭 `enable_thinking` 导致请求超时；新增 PostHog 成功/失败事件耗时记录
+- 继续排查 AI 识别失败：确认最新失败不是模型问题，而是 `pdf-parse/pdf.js` worker 在 Next/Turbopack Server Action 中被打包到错误路径；改为 `serverExternalPackages` + `file://` worker 后，浏览器实测按钮可回填技能、工作经历、教育经历和手机号等字段

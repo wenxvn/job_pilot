@@ -142,6 +142,39 @@ const response = await openai.chat.completions.create({
 | 评分/提取        | 0.3   |
 | 创意生成         | 0.7   |
 
+### 阿里云百炼 PDF 识别
+
+简历 PDF 使用百炼 `qwen3.5-ocr` Responses API 直接读取并提取结构化字段。
+
+```typescript
+const response = await fetch(`${process.env.BAILIAN_BASE_URL}/responses`, {
+  method: 'POST',
+  headers: {
+    Authorization: `Bearer ${process.env.BAILIAN_API_KEY}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    model: process.env.BAILIAN_OCR_MODEL ?? 'qwen3.5-ocr',
+    input: [{
+      role: 'user',
+      content: [
+        { type: 'input_file', file_url: signedUrl },
+        { type: 'input_text', text: extractionPrompt },
+      ],
+    }],
+  }),
+})
+```
+
+**规则：**
+
+- 百炼密钥只在服务端读取，永不传给浏览器
+- 通过 InsForge `createSignedUrl(path, 300)` 为 private PDF 生成 5 分钟签名 URL
+- `qwen3.5-ocr` 单次完成文字型或扫描版 PDF 读取与 Profile JSON 字段提取，不再二次调用文本模型
+- Responses 结构化结果读取 `output[].content[].text`，并在回填前做 JSON 解析和类型收窄
+- 识别结果只回填页面状态，不直接落库，仍需用户确认后保存
+- 页面上传限制为 10MB，模型最多处理 50 页 PDF
+
 ---
 
 ## Browserbase

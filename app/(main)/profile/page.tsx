@@ -7,10 +7,15 @@ import { ConnectedAccounts } from "@/components/features/profile/ConnectedAccoun
 import { ProfileAttentionBanner } from "@/components/features/profile/ProfileAttentionBanner";
 import { ProfileForm } from "@/components/features/profile/ProfileForm";
 import { ResumeSection } from "@/components/features/profile/ResumeSection";
-import { getProfile, upsertProfile, uploadResume } from "@/actions/profile";
+import {
+  extractResumeProfile,
+  getProfile,
+  upsertProfile,
+  uploadResume,
+} from "@/actions/profile";
 import { useAuth } from "@/hooks/useAuth";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
-import type { Profile, ProfileInput } from "@/types/profile";
+import type { Profile, ProfileInput, ResumeProfileExtract } from "@/types/profile";
 
 const EMPTY_PROFILE: ProfileInput = {
   full_name: "",
@@ -78,12 +83,34 @@ function toPreviewProfile(profile: ProfileInput): Profile {
   };
 }
 
+function applyExtractedProfile(
+  current: ProfileInput,
+  extracted: ResumeProfileExtract
+): ProfileInput {
+  return {
+    ...current,
+    full_name: extracted.full_name || current.full_name,
+    phone: extracted.phone || current.phone,
+    bio: extracted.bio || current.bio,
+    target_role: extracted.target_role || current.target_role,
+    location: extracted.location || current.location,
+    skills: extracted.skills?.length ? extracted.skills : current.skills,
+    experience: extracted.experience?.length
+      ? extracted.experience
+      : current.experience,
+    education: extracted.education?.length
+      ? extracted.education
+      : current.education,
+  };
+}
+
 export default function ProfilePage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileInput>(EMPTY_PROFILE);
   const [skillInput, setSkillInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [extracting, setExtracting] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
@@ -133,6 +160,42 @@ export default function ProfilePage() {
     setInfo("简历生成将在后续简历定制阶段接入。");
     posthog.capture("resume_generate_clicked", { source: "profile" });
     setTimeout(() => setInfo(null), 3000);
+  }
+
+  async function handleExtractResumeProfile() {
+    const startedAt = performance.now();
+    setExtracting(true);
+    setSaved(false);
+    setError(null);
+    setInfo(null);
+
+    const {
+      profile: extractedProfile,
+      error: err,
+      source,
+    } = await extractResumeProfile();
+    setExtracting(false);
+
+    if (err || !extractedProfile) {
+      posthog.capture("resume_profile_extract_failed", {
+        reason: err ?? "empty_result",
+        duration_ms: Math.round(performance.now() - startedAt),
+      });
+      setError(err ?? "AI 识别失败，请稍后重试");
+      return;
+    }
+
+    setProfile((current) => applyExtractedProfile(current, extractedProfile));
+    setBannerVisible(true);
+    setInfo("已读取 PDF 简历并填充资料，请检查后保存。");
+    posthog.capture("resume_profile_extracted", {
+      skills_count: extractedProfile.skills?.length ?? 0,
+      experience_count: extractedProfile.experience?.length ?? 0,
+      education_count: extractedProfile.education?.length ?? 0,
+      source: source ?? "unknown",
+      duration_ms: Math.round(performance.now() - startedAt),
+    });
+    setTimeout(() => setInfo(null), 5000);
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -234,7 +297,9 @@ export default function ProfilePage() {
             <ResumeSection
               resumeUrl={profile.resume_file_url}
               onUpload={handleResumeUpload}
+              onExtract={handleExtractResumeProfile}
               onGenerate={handleGenerateResume}
+              extracting={extracting}
               onResumeChange={(url, key) =>
                 setProfile((current) => ({
                   ...current,

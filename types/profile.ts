@@ -70,3 +70,14 @@ export type ProfileInput = Omit<
   | "created_at"
   | "updated_at"
 >;
+
+export interface ResumeProfileExtract {
+  full_name?: string;
+  phone?: string;
+  bio?: string;
+  target_role?: string;
+  location?: string;
+  skills?: string[];
+  experience?: Experience[];
+  education?: Education[];
+}

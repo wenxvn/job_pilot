@@ -180,12 +180,14 @@
 ### ResumeSection（简历管理）
 - **文件：** `components/features/profile/ResumeSection.tsx`
 - **类型：** Client Component
-- **数据规则：** 简历存储桶为 private，查看文件固定打开 `/api/profile/resume/view`，由服务端验证当前用户并以内联 PDF 响应；组件不直连 InsForge storage public URL
+- **数据规则：** 简历存储桶为 private，查看文件固定打开 `/api/profile/resume/view`，由服务端验证当前用户并以内联 PDF 响应；识别按钮调用 Server Action，通过 5 分钟签名 URL 让 `qwen3.5-ocr` 直接完成 PDF 读取和结构化字段提取，结果仅回填页面状态、不直接落库；组件不直连 InsForge storage public URL
 - **类名：**
   - 卡片容器：`group relative overflow-hidden rounded-xl border border-border bg-surface p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md animate-fade-in-up stagger-4`
   - 渐变顶条：`absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-info via-accent to-info opacity-0 transition-opacity group-hover:opacity-100`
   - 标题：`text-base font-semibold text-text-primary flex items-center gap-2`
   - 生成按钮：`inline-flex items-center gap-1.5 rounded-md bg-accent px-3 py-2 text-xs font-medium text-accent-foreground transition-all hover:brightness-110 hover:shadow-md hover:shadow-accent/20`
+  - AI 识别按钮：`inline-flex shrink-0 items-center gap-1.5 rounded-md bg-accent px-3 py-2 text-xs font-medium text-accent-foreground transition-all hover:brightness-110 hover:shadow-md hover:shadow-accent/20 disabled:opacity-50`
+  - 识别说明：`text-xs leading-relaxed text-text-muted`
   - 已上传文件行：`flex items-center gap-3 rounded-lg border border-border p-4 transition-colors hover:border-accent/30`
   - 上传区域：`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-all`
   - 拖拽态：`border-accent bg-accent/[0.05]`

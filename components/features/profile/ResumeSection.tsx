@@ -1,20 +1,24 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Upload, FileText, Wand2, X } from "lucide-react";
+import { Upload, FileText, ScanText, Wand2, X } from "lucide-react";
 
 interface ResumeSectionProps {
   resumeUrl: string;
   onResumeChange: (url: string, key: string) => void;
   onUpload: (file: File) => Promise<{ url: string; key: string } | null>;
+  onExtract?: () => void;
   onGenerate?: () => void;
+  extracting?: boolean;
 }
 
 export function ResumeSection({
   resumeUrl,
   onResumeChange,
   onUpload,
+  onExtract,
   onGenerate,
+  extracting = false,
 }: ResumeSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -117,6 +121,17 @@ export function ResumeSection({
                 查看文件
               </a>
             </div>
+            {onExtract && (
+              <button
+                type="button"
+                onClick={onExtract}
+                disabled={extracting}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-accent px-3 py-2 text-xs font-medium text-accent-foreground transition-all hover:brightness-110 hover:shadow-md hover:shadow-accent/20 disabled:opacity-50"
+              >
+                <ScanText className="h-3.5 w-3.5" />
+                {extracting ? "正在读取..." : "识别并填充"}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => onResumeChange("", "")}
@@ -125,6 +140,9 @@ export function ResumeSection({
               <X className="h-4 w-4" />
             </button>
           </div>
+          <p className="text-xs leading-relaxed text-text-muted">
+            支持文字型和扫描版 PDF，识别结果会自动填入个人资料。
+          </p>
 
           {/* 上传区域 — 替换 */}
           <div
