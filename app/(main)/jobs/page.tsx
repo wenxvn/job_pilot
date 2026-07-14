@@ -116,8 +116,6 @@ export default function JobsPage() {
 
   const filteredJobs = useMemo(() => jobs
     .filter((job) => statusFilter === "all" || job.status === statusFilter)
-    .filter((job) => !jobQuery.trim() || job.title.toLowerCase().includes(jobQuery.trim().toLowerCase()))
-    .filter((job) => !locationQuery.trim() || job.location.toLowerCase().includes(locationQuery.trim().toLowerCase()))
     .filter((job) => !listQuery.trim() || `${job.title} ${job.company} ${job.location}`.toLowerCase().includes(listQuery.trim().toLowerCase()))
     .filter((job) => matchFilter === "all" || (
       matchFilter === "high"
@@ -131,7 +129,7 @@ export default function JobsPage() {
       const secondValue = second[sortField];
       const difference = firstValue > secondValue ? 1 : firstValue < secondValue ? -1 : 0;
       return sortAsc ? difference : -difference;
-    }), [jobQuery, jobs, listQuery, locationQuery, matchFilter, sortAsc, sortField, statusFilter]);
+    }), [jobs, listQuery, matchFilter, sortAsc, sortField, statusFilter]);
 
   const stats = useMemo(() => ({
     total: jobs.length,
@@ -349,7 +347,11 @@ export default function JobsPage() {
         <div className="rounded-xl border border-border bg-surface p-12 text-center shadow-sm">
           <Briefcase className="mx-auto mb-4 h-12 w-12 text-text-muted" />
           <p className="mb-1 text-base font-semibold text-text-primary">暂无符合条件的职位</p>
-          <p className="text-sm text-text-muted">输入职位名称和地点，开始第一次真实职位搜索。</p>
+          <p className="text-sm text-text-muted">
+            {jobs.length > 0
+              ? "当前筛选条件隐藏了所有职位，请重置状态、匹配或列表关键词。"
+              : "输入职位名称和地点，开始第一次真实职位搜索。"}
+          </p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border bg-surface shadow-sm">
