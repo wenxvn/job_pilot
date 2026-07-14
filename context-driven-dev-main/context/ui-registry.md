@@ -221,7 +221,8 @@
 ### Jobs Page（职位列表页面）
 - **文件：** `app/(main)/jobs/page.tsx`
 - **类型：** Client Component
-- **搜索交互：** 顶部职位名称/地点搜索卡片，列表内支持按公司、职位或地点实时筛选；匹配筛选支持全部、高匹配、中匹配、低匹配。
+- **搜索交互：** 顶部职位名称/地点表单调用受保护的 `/api/jobs/search`，服务端通过 Jooble 搜索并保存结果；列表首次从 `/api/jobs` 加载，支持按公司、职位或地点实时筛选，以及全部、高匹配、中匹配、低匹配筛选。
+- **状态规则：** 搜索期间禁用输入和按钮并显示旋转图标；成功、失败、首次加载和空结果均使用独立中文反馈；未经过 AI 评分的职位显示“待评分”。
 - **类名：**
   - 统计卡片：`bg-surface border border-border rounded-xl p-4 shadow-sm`
   - 统计标签：`text-xs font-medium text-text-secondary uppercase`
@@ -244,10 +245,15 @@
   - 状态徽章（已保存）：`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-info-light text-info-foreground`
   - 状态徽章（已投递）：`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-accent-light text-accent`
   - 申请链接按钮：`p-1.5 text-text-muted hover:text-accent`
+  - 搜索中按钮：`bg-accent text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50` + `Loader2 animate-spin`
+  - 错误提示：`border border-error/20 bg-error/10 text-error`
+  - 成功提示：`border border-success/20 bg-success-light text-success-foreground`
+  - 加载状态：`flex items-center justify-center gap-2 rounded-xl border border-border bg-surface p-12 text-sm text-text-secondary shadow-sm`
 
 ### Job Detail Page（职位详情页面）
 - **文件：** `app/(main)/jobs/[id]/page.tsx`
 - **类型：** Client Component
+- **数据规则：** 使用动态路由 ID 调用受保护的 `/api/jobs/[id]`，仅返回当前用户的职位；Jooble 来源统一显示“查看职位来源”，无 AI 评分时显示说明卡片。
 - **类名：**
   - 返回链接：`inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-accent`
   - 职位信息卡片：`bg-surface border border-border rounded-xl p-6 shadow-sm`

@@ -10,7 +10,8 @@
 | 存储           | InsForge Storage                  | 文件存储（简历 PDF）     |
 | AI             | OpenAI GPT-4o                     | 匹配评分、简历定制       |
 | 样式           | Tailwind CSS v4 + shadcn/ui       | UI 组件和样式            |
-| 浏览器自动化   | Browserbase + Stagehand           | LinkedIn 职位抓取        |
+| 职位搜索       | Jooble REST API                   | 公开职位搜索             |
+| 浏览器自动化   | Browserbase + Stagehand           | LinkedIn 职位抓取扩展     |
 | 代理编排       | AgentSpan                         | 持久化代理任务           |
 | 语言           | TypeScript（严格模式）            | 全项目使用               |
 
@@ -70,21 +71,15 @@
 ```
 用户点击搜索
         ↓
-Server Action（触发搜索）
-        ↓
 API Route（/api/jobs/search）
         ↓
-Agent（LinkedIn 代理）
-        ↓
-Browserbase 会话（LinkedIn 认证）
-        ↓
-Stagehand（职位抓取）
-        ↓
-AI 评分（GPT-4o）
+Jooble REST API（真实职位搜索）
         ↓
 InsForge 数据库（保存职位）
         ↓
 UI 更新（职位列表）
+
+后续 AI 评分与 Browserbase/LinkedIn 搜索作为独立扩展接入。
 ```
 
 ### 2. 简历生成流程

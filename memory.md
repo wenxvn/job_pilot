@@ -1,42 +1,41 @@
-# Memory — 职位页面中文搜索与筛选
+# Memory — Browserbase MCP 配置
 
-Last updated: 2026-07-12 CST
+Last updated: 2026-07-14 CST
 
 ## What was built
 
-- 更新 `app/(main)/jobs/page.tsx`：新增中文职位名称和工作地点搜索卡片，支持输入后实时过滤职位。
-- 修复原列表搜索框仅展示、无法使用的问题；现在可按公司、职位或地点进行全文筛选。
-- 新增匹配分段筛选（全部、高匹配、中匹配、低匹配），并保留原有状态筛选、匹配分数/发现时间排序。
-- 搜索按钮和输入框回车会记录 `job_search_started` 事件，但当前职位数据仍是页面内模拟数据。
-- 更新 `context-driven-dev-main/context/ui-registry.md` 与 `context-driven-dev-main/context/progress-tracker.md`，登记职位页面搜索交互。
+- 按 `browserbase/mcp-server-browserbase` 官方 README，将 Browserbase 托管 MCP 服务添加到 Codex 全局配置 `/Users/wenxun/.codex/config.toml`。
+- MCP 服务名为 `browserbase`，使用官方推荐的 Streamable HTTP 托管端点；未向配置文件写入 API Key 或其他凭据。
+- 完成 MCP 初始化握手验证，服务正常返回协议版本和工具能力。
 
 ## Decisions made
 
-- 首版搜索继续沿用现有 Client Component 和模拟职位数据，不新增 API 或数据库逻辑；后续接入真实职位搜索时可复用现有搜索状态和筛选体验。
-- 职位名称和地点使用独立条件，列表搜索使用公司、职位、地点的组合全文匹配。
-- 匹配筛选阈值继续使用 `lib/utils.ts` 中的 `MATCH_THRESHOLD`，遵守项目约定。
+- 当前采用官方 README 推荐的托管 SHTTP 方案，而不是本地 `npx @browserbasehq/mcp` 或 Composio/Rube 方案。
+- 托管方案不依赖项目 `.env.local` 中的 Browserbase/Gemini 变量，避免在 MCP 配置中保存密钥。
+- 本次仅修改 Codex 全局 MCP 配置，不修改 JobPilot 项目代码或 UI 文档。
 
 ## Problems solved
 
-- 修复搜索输入没有 `value`、`onChange` 和过滤条件导致的“搜索功能不可用”。
-- 补齐了用户截图所需的中文搜索区域和中文筛选文案。
+- 确认 Browserbase 官方 MCP 端点可直接完成初始化握手，Codex 已将其识别为启用的 Streamable HTTP 服务。
+- 启动 Next.js 开发服务器时自动改写了 `next-env.d.ts` 的类型引用，已还原，项目工作区保持干净。
+- 内置浏览器插件初始化出现环境冲突；打开 `/jobs` 时改用系统默认浏览器完成导航。
 
 ## Current state
 
-- `npx tsc --noEmit`、`npm run build`、`git diff --check` 均通过。
-- 职位页面当前显示模拟数据；真实职位管理、数据库查询和 Browserbase/Stagehand 搜索尚未实现。
-- 工作区包含本次职位页面改动，以及此前 Profile/OCR 和中文 PDF 简历功能的未提交改动。
-- 未在记忆中保存任何密钥、token、密码或其他敏感值。
+- Codex 全局配置中 `browserbase` 已启用，服务端连接验证通过。
+- 当前任务不会热加载新增 MCP；需要重启 Codex 或新建任务后才能使用 Browserbase 工具。
+- `/jobs` 开发页面已在系统默认浏览器打开，开发服务器当时运行于本地端口 3000。
+- JobPilot 职位页面仍使用模拟数据；真实职位数据库逻辑与 Browserbase/Stagehand 搜索尚未实现。
+- 未在记忆中保存任何密钥、令牌、Cookie、会话标识或其他敏感值。
 
 ## Next session starts with
 
-1. 启动开发服务器并打开 `/jobs`，手动验证职位名称、地点、全文搜索和匹配筛选的交互。
-2. 检查移动端布局，必要时为筛选工具栏增加换行或响应式调整。
-3. 继续构建计划第 07 步职位管理逻辑：接入 `jobs` 表、用户限定查询、状态更新和真实列表数据。
-4. 真实职位搜索接入前，按项目要求读取 InsForge/Browsebase/Stagehand 相关技能与文档。
+1. 重启 Codex 或新建任务，确认 `browserbase` MCP 工具已加载。
+2. 使用 Browserbase 的 `start`、`navigate`、`observe`、`act`、`extract`、`end` 完成一次最小连接测试。
+3. 决定职位搜索是否需要保存的 LinkedIn Context ID；如果需要，评估改用支持 `--contextId` 的自托管 STDIO 方案。
+4. 继续职位管理与真实职位搜索前，按项目规范读取 Browserbase、Stagehand、InsForge 的最新技能和文档。
 
 ## Open questions
 
-- 搜索按钮目前只执行本地模拟数据过滤并记录事件；是否需要后续触发 LinkedIn/Browserbase 远程搜索。
-- 职位列表最终字段、分页、空状态和排序规则在接入真实 `jobs` 表后是否需要调整。
-- 中文 PDF 简历仍需要登录态浏览器验证长内容分页和下载效果。
+- 官方托管 MCP 是否能满足 JobPilot 对持久化 LinkedIn 登录上下文的需求，还是必须切换到自托管 STDIO。
+- 后续 Browserbase MCP 仅用于开发调试，还是也参与应用内职位搜索流程；应用运行时仍应优先使用 Browserbase SDK 与 Stagehand。

@@ -177,6 +177,29 @@ const response = await fetch(`${process.env.BAILIAN_BASE_URL}/responses`, {
 
 ---
 
+## Jooble REST API
+
+用于服务端按职位名称和地点搜索公开职位。
+
+```typescript
+const response = await fetch(`https://jooble.org/api/${process.env.JOOBLE_API_KEY}`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ keywords, location, page: 1 }),
+  cache: "no-store",
+})
+```
+
+**规则：**
+
+- `JOOBLE_API_KEY` 只在服务端读取，永不传给浏览器或写入日志
+- 所有请求通过 `lib/jooble.ts` 发起并设置超时
+- Jooble 结果在写入数据库前统一清理 HTML、验证链接并去重
+- 所有申请操作仅打开返回的外部链接
+- 新职位在 AI 评分接入前使用 `match_score: 0` 和空 `match_breakdown`
+
+---
+
 ## Browserbase
 
 云浏览器服务，用于 LinkedIn 认证会话和职位抓取。

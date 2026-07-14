@@ -119,6 +119,7 @@ LinkedIn 职位搜索和 AI 匹配评分。
 
 **逻辑：**
 
+- Jooble REST API 公开职位搜索与持久化
 - Browserbase 会话管理
 - LinkedIn 职位抓取（Stagehand）
 - GPT-4o 匹配评分

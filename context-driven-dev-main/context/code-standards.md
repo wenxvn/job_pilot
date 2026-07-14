@@ -127,6 +127,7 @@ export async function POST(request: Request) {
 | BAILIAN_API_KEY             | 阿里云百炼 API 密钥      |
 | BAILIAN_BASE_URL            | 阿里云百炼 OpenAI 兼容地址 |
 | BAILIAN_OCR_MODEL           | 阿里云百炼 PDF OCR 模型（默认 qwen3.5-ocr） |
+| JOOBLE_API_KEY              | Jooble 服务端职位搜索密钥 |
 | AGENTSPAN_API_KEY           | AgentSpan API 密钥       |
 | NEXT_PUBLIC_APP_URL         | 应用 URL                 |
 
